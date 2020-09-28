@@ -1,0 +1,39 @@
+{
+  "name": "ml-testing-toolkit-shared-lib",
+  "version": "11.0.0",
+  "description": "Shared library for ml-testing-toolkit re-usable functions",
+  "main": "index.js",
+  "pre-commit": [
+    "standard"
+  ],
+  "scripts": {
+    "start": "node src/index.js",
+    "standard": "standard",
+    "test": "npm run test:unit",
+    "test:unit": "jest --testMatch '**/test/unit/**/*.test.js'",
+    "test:int": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/integration/**/*.test.js'",
+    "test:coverage": "jest --coverage --coverageThreshold='{}' --testMatch '**/test/unit/**/*.test.js'",
+    "test:coverage-check": "jest --coverage --testMatch '**/test/unit/**/*.test.js'",
+    "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.js'",
+    "test:integration": "./test/integration-runner.sh ",
+    "cover": "npx nyc --all report --reporter=lcov npm run test",
+    "lint": "eslint --ignore-path ../.eslintignore .",
+    "audit:resolve": "SHELL=sh resolve-audit",
+    "audit:check": "SHELL=sh check-audit",
+    "dep:check": "npx ncu -e 2",
+    "dep:update": "npx ncu -u"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mojaloop/ml-testing-toolkit-shared-lib.git"
+  },
+  "author": "Vijaya Kumar Guthi, ModusBox Inc.",
+  "contributors": [
+    "Vijaya Kumar <vijaya.guthi@modusbox.com>"
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues"
+  },
+  "homepage": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib#readme"
+}
