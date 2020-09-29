@@ -38,5 +38,8 @@
   "homepage": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib#readme",
   "dependencies": {
     "node-dir": "^0.1.17"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }
