@@ -1,6 +1,7 @@
 const { readFileAsync, readRecursiveAsync, fileStatAsync } = require('../utils')
 const MASTERFILE_NAME = 'master.json'
 
+// Sample comment
 const getFileData = async (file_to_read, fileStat) => {
     try {
         const content = await readFileAsync(file_to_read)
