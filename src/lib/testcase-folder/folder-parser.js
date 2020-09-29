@@ -1,48 +1,4 @@
-const { readFileAsync, readRecursiveAsync, fileStatAsync } = require('../utils')
 const MASTERFILE_NAME = 'master.json'
-
-// Sample comment
-const getFileData = async (file_to_read, fileStat) => {
-    try {
-        const content = await readFileAsync(file_to_read)
-        const fileContent = JSON.parse(content);
-        return {
-            name: file_to_read,
-            path: file_to_read,
-            size: fileStat.size,
-            modified: '' + fileStat.mtime,
-            content: fileContent
-        }
-    } catch (err) {
-        console.log(err.message)
-        return null
-    }
-}
-const getFolderRawData = async (folderList) => {
-    var importFolderRawData = []
-
-    for (var i = 0; i < folderList.length; i++) {
-        const fileItem = folderList[i]
-        const stat = await fileStatAsync(fileItem)
-        if (stat.isFile() && fileItem.endsWith('.json')) {
-            const fileItemData = await getFileData(fileItem, stat)
-            if (fileItemData) {
-                importFolderRawData.push(fileItemData)
-            }
-        } else if (stat.isDirectory()){
-            const fileList = await readRecursiveAsync(fileItem)
-            for (var j = 0; j < fileList.length; j++) {
-                const fileItemData = await getFileData(fileList[j], stat)
-                if (fileItemData) {
-                    importFolderRawData.push(fileItemData)
-                }
-            }
-        }
-    }
-    importFolderRawData.sort((a, b) => a.path.localeCompare(b.path))
-    return importFolderRawData
-}
-
 
 const convertToFolderNestedArray = (folderRawData) => {
     // Form the object tree based from the array of paths
@@ -112,8 +68,7 @@ const convertToFolderNestedArray = (folderRawData) => {
     return treeDataArray
 }
 
-const getFolderData = async (fileList) => {
-    const importFolderRawData = await getFolderRawData(fileList)
+const getFolderData = (importFolderRawData) => {
     return convertToFolderNestedArray(importFolderRawData)
 }
 
@@ -165,10 +120,13 @@ getContentFromAbsolutePath = (path, folderData) => {
     return absolutePath
   } 
 
-  const addChildrenToTestCases = (folderData, nodeChildren, testCases, startIndex) => {
+  const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFiles, startIndex) => {
     var newTestCases = testCases
     for (let i=0; i<nodeChildren.length; i++) {
       if (nodeChildren[i].isLeaf) {
+        if (selectedFiles && !selectedFiles.includes(nodeChildren[i].key)) {
+          continue
+        }
         let templateContent = {}
         if (nodeChildren[i].extraInfo && nodeChildren[i].extraInfo.type === 'fileRef') {
           // Get the content using relative path
@@ -199,23 +157,27 @@ getContentFromAbsolutePath = (path, folderData) => {
       } else {
         if (nodeChildren[i].children) {
           // console.log('The node has children', nodeChildren[i].children, newTestCases)
-          newTestCases = addChildrenToTestCases(folderData, nodeChildren[i].children, newTestCases, startIndex)
+          newTestCases = addChildrenToTestCases(folderData, nodeChildren[i].children, newTestCases, selectedFiles, startIndex)
         }
       }
     }
     return newTestCases
   }
 
-  const getTempate = (folderData) => {
-    var template = {}
+  const getTestCases = (folderData, selectedFiles = null) => {
     var testCases = []
-    testCases = addChildrenToTestCases(folderData, folderData, testCases, 0)
-    template.test_cases = testCases
-    template.name = 'multi'
-    return template
+    testCases = addChildrenToTestCases(folderData, folderData, testCases, selectedFiles, 0)
+    return testCases
+  }
+
+  const sequenceTestCases = (testCases) => {
+    for (let i=0; i < testCases.length; i++) {
+      testCases[i].id = i + 1
+    }
   }
 
 module.exports = {
-    getTempate,
-    getFolderData
-} 
+    getTestCases,
+    getFolderData,
+    sequenceTestCases
+}
