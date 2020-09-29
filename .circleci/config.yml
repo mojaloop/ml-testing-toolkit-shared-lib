@@ -125,7 +125,7 @@ jobs:
           path: coverage
           prefix: test
       - store_test_results:
-          path: coverage/lcov.info
+          path: coverage
       - run:
           name: Copy code coverage to SonarQube
           command: |
