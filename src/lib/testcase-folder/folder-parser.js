@@ -53,41 +53,40 @@ const convertToFolderNestedArray = (folderRawData) => {
 
   // Form the array from the object fileTree
   const processFileOrFolder = (inputItem, inputArray, prefix = '') => {
-
-  const actionFileOrFolder = (fileOrFolderItem, extraInfo = null) => {
-      if (inputItem[fileOrFolderItem]) {
-      if(inputItem[fileOrFolderItem].type === 'file') {
-          extraInfo = extraInfo ? extraInfo : { type: 'file' }
-          inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, isLeaf: true, extraInfo, content: inputItem[fileOrFolderItem].content })
-      } else {
-          var children = []
-          processFileOrFolder(inputItem[fileOrFolderItem], children, (prefix ? (prefix + '/') : '') + fileOrFolderItem)
-          extraInfo = extraInfo ? extraInfo : { type: 'folder' }
-          inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, extraInfo, children: children })
-      }
-      }
-  }
-  const actionFileRef = (name, refPath) => {
-      const extraInfo = {
-      type: 'fileRef',
-      path: refPath
-      }
-      inputArray.push({ key: (prefix ? (prefix + '/') : '') + name, title: name, extraInfo, isLeaf: true})
-  }
-  // If master.json file exists in inputItem
-  if (inputItem.hasOwnProperty(MASTERFILE_NAME)) {
-      inputItem[MASTERFILE_NAME].content.order.forEach(orderItem => {
-      if(orderItem.type === 'file' || orderItem.type === 'folder') {
-          actionFileOrFolder(orderItem.name, { type: orderItem.type })
-      } else if(orderItem.type === 'fileRef') {
-          actionFileRef(orderItem.name, orderItem.path)
-      }
-      })
-  } else {
-      for (const fileOrFolderItem in inputItem) {
-      actionFileOrFolder(fileOrFolderItem)
-      }
-  }
+    const actionFileOrFolder = (fileOrFolderItem, extraInfo = null) => {
+        if (inputItem[fileOrFolderItem]) {
+        if(inputItem[fileOrFolderItem].type === 'file') {
+            extraInfo = extraInfo ? extraInfo : { type: 'file' }
+            inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, isLeaf: true, extraInfo, content: inputItem[fileOrFolderItem].content })
+        } else {
+            var children = []
+            processFileOrFolder(inputItem[fileOrFolderItem], children, (prefix ? (prefix + '/') : '') + fileOrFolderItem)
+            extraInfo = extraInfo || { type: 'folder' }
+            inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, extraInfo, children: children })
+        }
+        }
+    }
+    const actionFileRef = (name, refPath) => {
+        const extraInfo = {
+        type: 'fileRef',
+        path: refPath
+        }
+        inputArray.push({ key: (prefix ? (prefix + '/') : '') + name, title: name, extraInfo, isLeaf: true})
+    }
+    // If master.json file exists in inputItem
+    if (inputItem.hasOwnProperty(MASTERFILE_NAME)) {
+        inputItem[MASTERFILE_NAME].content.order.forEach(orderItem => {
+          if(orderItem.type === 'file' || orderItem.type === 'folder') {
+              actionFileOrFolder(orderItem.name, { type: orderItem.type })
+          } else if(orderItem.type === 'fileRef') {
+              actionFileRef(orderItem.name, orderItem.path)
+          }
+        })
+    } else {
+        for (const fileOrFolderItem in inputItem) {
+          actionFileOrFolder(fileOrFolderItem)
+        }
+    }
   }
   const treeDataArray = []
   processFileOrFolder(fileTree, treeDataArray)
