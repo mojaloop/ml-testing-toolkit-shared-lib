@@ -97,7 +97,7 @@ const getFolderData = (importFolderRawData) => {
   return convertToFolderNestedArray(importFolderRawData)
 }
 
-const getContentFromAbsolutePath = (path, folderData) => {
+const findNodeFromAbsolutePath = (path, folderData) => {
   // Get the content of the corresponding node based on the absolute path from this.state.folderData
   const pathArray = path.split('/')
   let children = folderData
@@ -110,7 +110,11 @@ const getContentFromAbsolutePath = (path, folderData) => {
       return null
     }
   }
-  const findNode = children.find(item => (item.title === pathArray[pathArray.length - 1]))
+  return children.find(item => (item.title === pathArray[pathArray.length - 1]))
+}
+
+const getContentFromAbsolutePath = (path, folderData) => {
+  const findNode = findNodeFromAbsolutePath(path, folderData)
   if (findNode) {
     return findNode.content
   }
@@ -205,5 +209,6 @@ const sequenceTestCases = (testCases) => {
 module.exports = {
     getTestCases,
     getFolderData,
-    sequenceTestCases
+    sequenceTestCases,
+    findNodeFromAbsolutePath
 }
