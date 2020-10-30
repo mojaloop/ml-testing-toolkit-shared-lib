@@ -1,6 +1,6 @@
 {
   "name": "ml-testing-toolkit-shared-lib",
-  "version": "11.0.1",
+  "version": "11.0.2",
   "description": "Shared library for ml-testing-toolkit re-usable functions",
   "main": "src/index.js",
   "pre-commit": [
