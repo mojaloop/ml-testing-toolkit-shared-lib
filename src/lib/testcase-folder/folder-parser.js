@@ -126,7 +126,9 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
   const basePathArray = refNode.key.split('/')
   const refPathArray = refNode.extraInfo.path.split('/')
   let absolutePath = ''
-  if (refPathArray[0] == '.') {
+  if (refPathArray[0] == '') { // If the path is already absolute path
+    absolutePath = refPathArray.slice(1).join('/') // Just remove the starting slash
+  } else if (refPathArray[0] == '.') {
     absolutePath = basePathArray.slice(0, -1).join('/') + '/' + refPathArray.slice(1).join('/')
   } else if (refPathArray[0] == '..') {
     // Count the double dots
