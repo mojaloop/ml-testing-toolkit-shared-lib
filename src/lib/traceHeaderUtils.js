@@ -61,12 +61,12 @@ const getTraceParentHeader = (traceID) => {
 
 const generateSessionId = () => {
   // Create a session ID (24 hex chars)
-  return this.randHex(24)
+  return randHex(24)
 }
 
 const generateEndToEndId = () => {
   // Create a end to end transaction ID (4 hex chars)
-  return this.randHex(4)
+  return randHex(4)
 }
 
 module.exports = {
