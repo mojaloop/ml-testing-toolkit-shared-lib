@@ -21,8 +21,61 @@
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
+const customTracePrefix = 'aabb'
 
-'use strict'
+const randHex = (len) => {
+  const maxlen = 8
+  const min = Math.pow(16, Math.min(len, maxlen) - 1)
+  const max = Math.pow(16, Math.min(len, maxlen)) - 1
+  const n = Math.floor(Math.random() * (max - min + 1)) + min
+  let r = n.toString(16)
+  while (r.length < len) {
+    r = r + randHex(len - maxlen)
+  }
+  return r
+}
 
-exports.FolderParser = require('./lib/testcase-folder/folder-parser')
-exports.TraceHeaderUtils = require('./lib/traceHeaderUtils')
+const isCustomTraceID = (traceID) => {
+  return traceID.startsWith(customTracePrefix)
+}
+
+const getEndToEndID = (traceID) => {
+  return traceID.slice(-4)
+}
+
+const getSessionID = (traceID) => {
+  return traceID.slice(4, -4)
+}
+
+const getTraceIdPrefix = () => {
+  return customTracePrefix
+}
+
+const generateRandTraceId = () => {
+  return 'ccdd' + randHex(26)
+}
+
+const getTraceParentHeader = (traceID) => {
+  return '00-' + traceID + '-0123456789abcdef0-00'
+}
+
+const generateSessionId = () => {
+  // Create a session ID (24 hex chars)
+  return randHex(24)
+}
+
+const generateEndToEndId = () => {
+  // Create a end to end transaction ID (4 hex chars)
+  return randHex(4)
+}
+
+module.exports = {
+  isCustomTraceID,
+  getEndToEndID,
+  getSessionID,
+  getTraceIdPrefix,
+  generateRandTraceId,
+  getTraceParentHeader,
+  generateSessionId,
+  generateEndToEndId
+}
