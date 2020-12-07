@@ -204,6 +204,28 @@ const generateMockHeaders = async (method, name, data, jsfRefs) => {
   return fakedResponse
 }
 
+const generateMockQueryParams = async (method, name, data, jsfRefs) => {
+  const queryParams = {}
+  data.parameters.forEach(param => {
+    if (param.in === 'query') {
+      queryParams[param.name] = (param.schema) ? { ... param.schema } : {}
+    }
+  })
+  jsfRefs.forEach(ref => {
+    if (queryParams[ref.id]) {
+      queryParams[ref.id] = { $ref: ref.id }
+    }
+  })
+
+  if (Object.keys(queryParams).length === 0) {
+    return {}
+  }
+
+  const fakedResponse = await jsf.resolve(queryParams, jsfRefs)
+
+  return fakedResponse
+}
+
 class OpenApiRequestGenerator {
   constructor () {
     this.schema = {}
@@ -213,21 +235,28 @@ class OpenApiRequestGenerator {
     this.schema = await loadYamlFile(schemaPath)
   }
 
-  async generateRequestBody (path, httpMethod, jsfRefs) {
+  async generateRequestBody (path, httpMethod, jsfRefs = []) {
     const pathValue = this.schema.paths[path]
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary
     return generateMockOperation(httpMethod, id, operation, jsfRefs)
   }
 
-  async generateRequestHeaders (path, httpMethod, jsfRefs) {
+  async generateRequestHeaders (path, httpMethod, jsfRefs = []) {
     const pathValue = this.schema.paths[path]
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary
     return generateMockHeaders(httpMethod, id, operation, jsfRefs)
   }
 
-  async generateResponseBody (path, httpMethod, jsfRefs) {
+  async generateRequestQueryParams (path, httpMethod, jsfRefs = []) {
+    const pathValue = this.schema.paths[path]
+    const operation = pathValue[httpMethod]
+    const id = operation.operationId || operation.summary
+    return generateMockQueryParams(httpMethod, id, operation, jsfRefs)
+  }
+
+  async generateResponseBody (path, httpMethod, jsfRefs = []) {
     const pathValue = this.schema.paths[path]
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary
