@@ -1,6 +1,6 @@
 {
   "name": "ml-testing-toolkit-shared-lib",
-  "version": "11.1.0",
+  "version": "11.2.0",
   "description": "Shared library for ml-testing-toolkit re-usable functions",
   "main": "src/index.js",
   "pre-commit": [
@@ -37,6 +37,10 @@
   },
   "homepage": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib#readme",
   "dependencies": {
+    "faker": "5.1.0",
+    "json-schema-faker": "0.5.0-rcv.32",
+    "json-schema-ref-parser": "9.0.6",
+    "lodash": "4.17.20",
     "node-dir": "0.1.17"
   },
   "devDependencies": {

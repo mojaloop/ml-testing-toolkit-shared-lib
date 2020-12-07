@@ -26,3 +26,4 @@
 
 exports.FolderParser = require('./lib/testcase-folder/folder-parser')
 exports.TraceHeaderUtils = require('./lib/traceHeaderUtils')
+exports.OpenApiMockGenerator = require('./lib/openApiMockGenerator')
