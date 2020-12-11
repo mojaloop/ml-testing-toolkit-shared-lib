@@ -82,6 +82,13 @@ const convertToFolderNestedArray = (folderRawData) => {
               actionFileRef(orderItem.name, orderItem.path)
           }
         })
+        // Add missing files in MASTERFILE
+        for (const fileOrFolderItem in inputItem) {
+          if (fileOrFolderItem !== MASTERFILE_NAME && inputItem[MASTERFILE_NAME].content.order.find(item => (item.name === fileOrFolderItem)) === undefined) {
+            actionFileOrFolder(fileOrFolderItem)
+          }
+        }
+
     } else {
         for (const fileOrFolderItem in inputItem) {
           actionFileOrFolder(fileOrFolderItem)
