@@ -208,7 +208,7 @@ const sampleWrongFolderRawDataWithFileRefWrongRelativePath = [
 const sampleWrongFolderRawDataWithWithUnknownType = [
   {
     name: 'name1',
-    path: 'path1',
+    path: 'name1',
     size: 123,
     modified: 'modified1',
     content: { name: 'template1', test_cases: [ sampleTestCase ] }

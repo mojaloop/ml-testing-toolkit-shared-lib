@@ -1,0 +1,22 @@
+{
+  "decisions": {
+    "1589|npm-check-updates>libnpmconfig>ini": {
+      "decision": "postpone",
+      "madeAt": 1607711567315
+    },
+    "1589|npm-check-updates>update-notifier>is-installed-globally>global-dirs>ini": {
+      "decision": "postpone",
+      "madeAt": 1607711567315
+    },
+    "1589|npm-check-updates>update-notifier>latest-version>package-json>registry-auth-token>rc>ini": {
+      "decision": "postpone",
+      "madeAt": 1607711567315
+    },
+    "1589|npm-check-updates>update-notifier>latest-version>package-json>registry-url>rc>ini": {
+      "decision": "postpone",
+      "madeAt": 1607711567315
+    }
+  },
+  "rules": {},
+  "version": 1
+}
