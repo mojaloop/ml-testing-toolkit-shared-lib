@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib#readme",
   "dependencies": {
-    "ajv": "^6.12.6",
+    "ajv": "6.12.6",
     "faker": "5.1.0",
     "json-schema-faker": "0.5.0-rcv.32",
     "json-schema-ref-parser": "9.0.6",
