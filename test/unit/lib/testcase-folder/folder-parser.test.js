@@ -374,7 +374,7 @@ describe('FolderParser', () => {
 
       // Validate the second test case
       expect(testCases[1]).toHaveProperty('id')
-      expect(testCases[1].id).toEqual(2)
+      expect(testCases[1].id).toEqual(1)
       expect(testCases[1]).toHaveProperty('name')
       expect(testCases[1].name).toEqual('Test Case Name')
     })
