@@ -180,13 +180,14 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
         templateContent = nodeChildren[i].content;
       }
       try {
-        templateContent.test_cases = templateContent.test_cases.map((testCase, index) => {
-          const { id, ...remainingProps } = testCase
-          return {
-            id: startIndex + index + 1,
-            ...remainingProps
-          }
-        })
+        templateContent.test_cases = templateContent.test_cases
+        // templateContent.test_cases = templateContent.test_cases.map((testCase, index) => {
+        //   const { id, ...remainingProps } = testCase
+        //   return {
+        //     id: startIndex + index + 1,
+        //     ...remainingProps
+        //   }
+        // })
         startIndex = startIndex + templateContent.test_cases.length
         newTestCases = newTestCases.concat(templateContent.test_cases)
       } catch(err) {
