@@ -50,7 +50,7 @@
     "node-dir": "0.1.17"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.23",
+    "@types/jest": "26.0.23",
     "jest": "27.0.4",
     "jest-junit": "12.1.0",
     "npm-audit-resolver": "2.3.1",
