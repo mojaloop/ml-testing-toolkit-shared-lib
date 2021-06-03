@@ -38,28 +38,28 @@ const sampleFolderRawData = [
     path: 'path1',
     size: 123,
     modified: 'modified1',
-    content: { name: 'template1', test_cases: [ sampleTestCase ] }
+    content: { name: 'template1', test_cases: [sampleTestCase] }
   },
   {
     name: 'name2',
     path: 'path2',
     size: 123,
     modified: 'modified2',
-    content: { name: 'template2', test_cases: [ sampleTestCase ] }
+    content: { name: 'template2', test_cases: [sampleTestCase] }
   },
   {
     name: 'name3',
     path: 'path3/name3',
     size: 123,
     modified: 'modified3',
-    content: { name: 'template3', test_cases: [ sampleTestCase ] }
+    content: { name: 'template3', test_cases: [sampleTestCase] }
   },
   {
     name: 'name4',
     path: 'path3/name4',
     size: 123,
     modified: 'modified4',
-    content: { name: 'template4', test_cases: [ sampleTestCase ] }
+    content: { name: 'template4', test_cases: [sampleTestCase] }
   },
   {
     name: 'master.json',
@@ -93,7 +93,7 @@ const sampleFolderRawData = [
         }
       ]
     }
-  },
+  }
 ]
 
 const sampleFolderRawDataWithMultipleFolderLevels = [
@@ -102,28 +102,28 @@ const sampleFolderRawDataWithMultipleFolderLevels = [
     path: 'path1',
     size: 123,
     modified: 'modified1',
-    content: { name: 'template1', test_cases: [ sampleTestCase ] }
+    content: { name: 'template1', test_cases: [sampleTestCase] }
   },
   {
     name: 'name2',
     path: 'path2/subpath21/name2',
     size: 123,
     modified: 'modified2',
-    content: { name: 'template2', test_cases: [ sampleTestCase ] }
+    content: { name: 'template2', test_cases: [sampleTestCase] }
   },
   {
     name: 'name3',
     path: 'path2/subpath22/name3',
     size: 123,
     modified: 'modified3',
-    content: { name: 'template3', test_cases: [ sampleTestCase ] }
+    content: { name: 'template3', test_cases: [sampleTestCase] }
   },
   {
     name: 'name4',
     path: 'path2/name4',
     size: 123,
     modified: 'modified4',
-    content: { name: 'template4', test_cases: [ sampleTestCase ] }
+    content: { name: 'template4', test_cases: [sampleTestCase] }
   }
 ]
 
@@ -142,14 +142,14 @@ const sampleWrongFolderRawDataWithWrongFileRef = [
     path: 'path1',
     size: 123,
     modified: 'modified1',
-    content: { name: 'template1', test_cases: [ sampleTestCase ] }
+    content: { name: 'template1', test_cases: [sampleTestCase] }
   },
   {
     name: 'name2',
     path: 'path2',
     size: 123,
     modified: 'modified2',
-    content: { name: 'template2', test_cases: [ sampleTestCase ] }
+    content: { name: 'template2', test_cases: [sampleTestCase] }
   },
   {
     name: 'master.json',
@@ -173,7 +173,7 @@ const sampleWrongFolderRawDataWithWrongFileRef = [
         }
       ]
     }
-  },
+  }
 ]
 
 const sampleWrongFolderRawDataWithFileRefWrongRelativePath = [
@@ -182,7 +182,7 @@ const sampleWrongFolderRawDataWithFileRefWrongRelativePath = [
     path: 'path1',
     size: 123,
     modified: 'modified1',
-    content: { name: 'template1', test_cases: [ sampleTestCase ] }
+    content: { name: 'template1', test_cases: [sampleTestCase] }
   },
   {
     name: 'master.json',
@@ -202,7 +202,7 @@ const sampleWrongFolderRawDataWithFileRefWrongRelativePath = [
         }
       ]
     }
-  },
+  }
 ]
 
 const sampleWrongFolderRawDataWithWithUnknownType = [
@@ -211,7 +211,7 @@ const sampleWrongFolderRawDataWithWithUnknownType = [
     path: 'name1',
     size: 123,
     modified: 'modified1',
-    content: { name: 'template1', test_cases: [ sampleTestCase ] }
+    content: { name: 'template1', test_cases: [sampleTestCase] }
   },
   {
     name: 'master.json',
@@ -226,7 +226,7 @@ const sampleWrongFolderRawDataWithWithUnknownType = [
         }
       ]
     }
-  },
+  }
 ]
 
 const sampleSelectedFiles = [
@@ -344,7 +344,6 @@ describe('FolderParser', () => {
       expect(subChild1.isLeaf).toBeTruthy()
       expect(subChild1.extraInfo).toHaveProperty('type')
       expect(subChild1.extraInfo.type).toEqual('file')
-
     })
   })
 
@@ -442,8 +441,8 @@ describe('FolderParser', () => {
       // First get the folderData
       const folderData = FolderParser.getFolderData(sampleFolderRawData)
       // Chnage the folder data
-      folderData[0].title = 'wrongtitle' 
-      const testCases = FolderParser.getTestCases(folderData, [ 'path3/name1' ])
+      folderData[0].title = 'wrongtitle'
+      const testCases = FolderParser.getTestCases(folderData, ['path3/name1'])
       expect(Array.isArray(testCases)).toBe(true)
       expect(testCases.length).toEqual(0)
     })

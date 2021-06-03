@@ -29,6 +29,7 @@ const _ = require('lodash')
 const faker = require('faker')
 const jsf = require('json-schema-faker')
 const $RefParser = require('json-schema-ref-parser')
+const Ajv = require('ajv')
 
 jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence(12)).toString('base64'))
 
@@ -39,8 +40,11 @@ jsf.option({
 })
 jsf.extend('faker', () => require('faker'))
 
-const ajv = require('ajv')({
-  unknownFormats: 'ignore'
+const ajv = new Ajv({
+  strict: false,
+  formats: {
+    reserved: true
+  }
 })
 
 async function loadYamlFile (fn) {
@@ -208,7 +212,7 @@ const generateMockQueryParams = async (method, name, data, jsfRefs) => {
   const queryParams = {}
   data.parameters.forEach(param => {
     if (param.in === 'query') {
-      queryParams[param.name] = (param.schema) ? { ... param.schema } : {}
+      queryParams[param.name] = (param.schema) ? { ...param.schema } : {}
     }
   })
   jsfRefs.forEach(ref => {
@@ -222,6 +226,28 @@ const generateMockQueryParams = async (method, name, data, jsfRefs) => {
   }
 
   const fakedResponse = await jsf.resolve(queryParams, jsfRefs)
+
+  return fakedResponse
+}
+
+const generateMockPathParams = async (method, name, data, jsfRefs) => {
+  const pathParams = {}
+  data.parameters.forEach(param => {
+    if (param.in === 'path') {
+      pathParams[param.name] = (param.schema) ? { ...param.schema } : {}
+    }
+  })
+  jsfRefs.forEach(ref => {
+    if (pathParams[ref.id]) {
+      pathParams[ref.id] = { $ref: ref.id }
+    }
+  })
+
+  if (Object.keys(pathParams).length === 0) {
+    return {}
+  }
+
+  const fakedResponse = await jsf.resolve(pathParams, jsfRefs)
 
   return fakedResponse
 }
@@ -254,6 +280,13 @@ class OpenApiRequestGenerator {
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary
     return generateMockQueryParams(httpMethod, id, operation, jsfRefs)
+  }
+
+  async generateRequestPathParams (path, httpMethod, jsfRefs = []) {
+    const pathValue = this.schema.paths[path]
+    const operation = pathValue[httpMethod]
+    const id = operation.operationId || operation.summary
+    return generateMockPathParams(httpMethod, id, operation, jsfRefs)
   }
 
   async generateResponseBody (path, httpMethod, jsfRefs = []) {
