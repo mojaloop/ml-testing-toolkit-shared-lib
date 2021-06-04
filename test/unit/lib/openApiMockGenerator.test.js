@@ -71,6 +71,10 @@ describe('OpenApiMockGenerator', () => {
       const result = await mockGenerator.generateRequestHeaders('/transfers', 'post')
       expect(result).toEqual(expect.anything())
     })
+    it('generateRequestPathParams should generate empty object for path params', async () => {
+      const result = await mockGenerator.generateRequestPathParams('/transfers', 'post', jsfRef)
+      expect(result).toEqual({})
+    })
   })
   describe('load a sync api file', () => {
     const mockGenerator = new OpenApiMockGenerator()
