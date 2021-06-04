@@ -24,55 +24,60 @@
  ******/
 
 'use strict'
-const fs = require('fs')
 
 const OpenApiMockGenerator = require('../../../src/lib/openApiMockGenerator')
-const mockGenerator = new OpenApiMockGenerator()
+// const mockGenerator = new OpenApiMockGenerator()
 const specFilePrefix = 'test/samples/'
 
 const jsfRef = [
   {
-    "id": "quoteId"
+    id: 'quoteId'
   },
   {
-    "id": "id"
+    id: 'id'
   },
   {
-    "id": "state",
-    "pattern": "Created|Closed"
+    id: 'state',
+    pattern: 'Created|Closed'
   },
   {
-    "id": "reason",
-    "pattern": "Created|Closed"
+    id: 'reason',
+    pattern: 'Created|Closed'
   },
-  
+
   {
-    "id": "Content-Length",
-    "pattern": "123"
+    id: 'Content-Length',
+    pattern: '123'
   }
 ]
 
-
 describe('OpenApiMockGenerator', () => {
   describe('load a async api file', () => {
+    const mockGenerator = new OpenApiMockGenerator()
     it('Load method should not throw error', async () => {
       await expect(mockGenerator.load(specFilePrefix + 'api_spec_async.yaml')).resolves.toBeUndefined()
     })
     it('generateRequestBody should generate a request body', async () => {
-      const result = await mockGenerator.generateRequestBody( '/quotes', 'post', jsfRef)
+      const result = await mockGenerator.generateRequestBody('/quotes', 'post', jsfRef)
       expect(result).toHaveProperty('quoteId')
     })
     it('generateRequestHeaders should generate a request headers', async () => {
-      const result = await mockGenerator.generateRequestHeaders( '/quotes', 'post', jsfRef)
+      const result = await mockGenerator.generateRequestHeaders('/quotes', 'post', jsfRef)
       expect(result).toHaveProperty('Accept')
       expect(result).toHaveProperty('Content-Type')
       expect(result).toHaveProperty('Date')
     })
     it('generateRequestHeaders should generate a request headers', async () => {
-      const result = await mockGenerator.generateRequestHeaders( '/transfers', 'post')
+      const result = await mockGenerator.generateRequestHeaders('/transfers', 'post')
+      expect(result).toEqual(expect.anything())
+    })
+    it('generateRequestPathParams should generate empty object for path params', async () => {
+      const result = await mockGenerator.generateRequestPathParams('/transfers', 'post', jsfRef)
+      expect(result).toEqual({})
     })
   })
   describe('load a sync api file', () => {
+    const mockGenerator = new OpenApiMockGenerator()
     it('Load method should not throw error', async () => {
       await expect(mockGenerator.load(specFilePrefix + 'api_spec_sync_empty.yaml')).resolves.toBeUndefined()
     })
@@ -80,57 +85,54 @@ describe('OpenApiMockGenerator', () => {
       await expect(mockGenerator.load(specFilePrefix + 'api_spec_sync.yaml')).resolves.toBeUndefined()
     })
     it('generateRequestBody should generate a request body', async () => {
-      const result = await mockGenerator.generateRequestBody( '/settlements', 'post', jsfRef)
+      const result = await mockGenerator.generateRequestBody('/settlements', 'post', jsfRef)
       expect(result).toHaveProperty('reason')
       expect(result).toHaveProperty('settlementWindows')
     })
     it('generateRequestBody should generate a request body', async () => {
-      const result = await mockGenerator.generateRequestBody( '/settlements', 'post')
+      const result = await mockGenerator.generateRequestBody('/settlements', 'post')
       expect(result).toHaveProperty('reason')
       expect(result).toHaveProperty('settlementWindows')
     })
     it('generateResponseBody should generate a request body', async () => {
-      const result = await mockGenerator.generateResponseBody( '/settlements', 'get', jsfRef)
+      const result = await mockGenerator.generateResponseBody('/settlements', 'get', jsfRef)
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('status')
     })
     it('generateResponseBody should generate a request body', async () => {
-      const result = await mockGenerator.generateResponseBody( '/settlements', 'get')
+      const result = await mockGenerator.generateResponseBody('/settlements', 'get')
       expect(result).toHaveProperty('body')
       expect(result).toHaveProperty('status')
     })
-    
+
     it('generateResponseBody should generate a request body if response type is array', async () => {
-      const result = await mockGenerator.generateResponseBody( '/settlementWindows', 'get', jsfRef)
+      const result = await mockGenerator.generateResponseBody('/settlementWindows', 'get', jsfRef)
       expect(result).toStrictEqual({})
     })
     it('generateResponseBody should generate a request body if response type is object', async () => {
-      const result = await mockGenerator.generateResponseBody( '/settlementWindows/{id}', 'get', jsfRef)
+      const result = await mockGenerator.generateResponseBody('/settlementWindows/{id}', 'get', jsfRef)
       expect(result.status).toBe('200')
     })
     it('generateRequestQueryParams should generate query params', async () => {
-      const result = await mockGenerator.generateRequestQueryParams( '/settlementWindows', 'get')
+      const result = await mockGenerator.generateRequestQueryParams('/settlementWindows', 'get')
       expect(result).toHaveProperty('fromDateTime')
       expect(result).toHaveProperty('participantId')
       expect(result).toHaveProperty('state')
     })
     it('generateRequestQueryParams should generate query params', async () => {
-      const jsfRefNew  = [
-        ...jsfRef,
-        {
-          "id": "participantId",
-          "pattern": "123"
-        }
-      ]
-      const result = await mockGenerator.generateRequestQueryParams( '/settlementWindows', 'get', jsfRef)
+      const result = await mockGenerator.generateRequestQueryParams('/settlementWindows', 'get', jsfRef)
       console.log(result)
       expect(result).toHaveProperty('fromDateTime')
       expect(result).toHaveProperty('participantId')
       expect(result).toHaveProperty('state')
     })
     it('generateRequestQueryParams should generate query params', async () => {
-      const result = await mockGenerator.generateRequestQueryParams( '/settlementWindows/{id}', 'get', jsfRef)
+      const result = await mockGenerator.generateRequestQueryParams('/settlementWindows/{id}', 'get', jsfRef)
       expect(result).toEqual({})
+    })
+    it('generateRequestPathParams should generate path params', async () => {
+      const result = await mockGenerator.generateRequestPathParams('/settlementWindows/{id}', 'get', jsfRef)
+      expect(result).toHaveProperty('id')
     })
   })
 })

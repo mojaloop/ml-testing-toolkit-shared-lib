@@ -28,71 +28,69 @@ const MASTERFILE_NAME = 'master.json'
 
 const convertToFolderNestedArray = (folderRawData) => {
   // Form the object tree based from the array of paths
-  var fileTree = {};
+  const fileTree = {}
   const mergePathsIntoFileTree = (fileItem) => {
-  return (prevDir, currDir, i, filePath) => {
+    return (prevDir, currDir, i, filePath) => {
       if (i === filePath.length - 1) {
-      prevDir[currDir] = { type: 'file', content: fileItem.content };
+        prevDir[currDir] = { type: 'file', content: fileItem.content }
       }
-      if (!prevDir.hasOwnProperty(currDir)) {
-      prevDir[currDir] = {};
+      if (!Object.prototype.hasOwnProperty.call(prevDir, currDir)) {
+        prevDir[currDir] = {}
       }
-      return prevDir[currDir];
+      return prevDir[currDir]
+    }
   }
+  function parseFileItem (fileItem) {
+    const fileLocation = fileItem.path.split('/')
+    // If file is in root directory, eg 'index.js'
+    if (fileLocation.length === 1) {
+      return (fileTree[fileLocation[0]] = { type: 'file', content: fileItem.content })
+    }
+    fileLocation.reduce(mergePathsIntoFileTree(fileItem), fileTree)
   }
-  function parseFileItem(fileItem) {
-  var fileLocation = fileItem.path.split('/');
-  // If file is in root directory, eg 'index.js'
-  if (fileLocation.length === 1) {
-      return (fileTree[fileLocation[0]] = { type: 'file', content: fileItem.content });
-  }
-  fileLocation.reduce(mergePathsIntoFileTree(fileItem), fileTree);
-  }
-  folderRawData.forEach(parseFileItem);
-
+  folderRawData.forEach(parseFileItem)
 
   // Form the array from the object fileTree
   const processFileOrFolder = (inputItem, inputArray, prefix = '') => {
     const actionFileOrFolder = (fileOrFolderItem, extraInfo = null) => {
-        if (inputItem[fileOrFolderItem]) {
-        if(inputItem[fileOrFolderItem].type === 'file') {
-            extraInfo = extraInfo ? extraInfo : { type: 'file' }
-            inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, isLeaf: true, extraInfo, content: inputItem[fileOrFolderItem].content })
+      if (inputItem[fileOrFolderItem]) {
+        if (inputItem[fileOrFolderItem].type === 'file') {
+          extraInfo = extraInfo || { type: 'file' }
+          inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, isLeaf: true, extraInfo, content: inputItem[fileOrFolderItem].content })
         } else {
-            var children = []
-            processFileOrFolder(inputItem[fileOrFolderItem], children, (prefix ? (prefix + '/') : '') + fileOrFolderItem)
-            extraInfo = extraInfo || { type: 'folder' }
-            inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, extraInfo, children: children })
+          const children = []
+          processFileOrFolder(inputItem[fileOrFolderItem], children, (prefix ? (prefix + '/') : '') + fileOrFolderItem)
+          extraInfo = extraInfo || { type: 'folder' }
+          inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, extraInfo, children: children })
         }
-        }
+      }
     }
     const actionFileRef = (name, refPath) => {
-        const extraInfo = {
+      const extraInfo = {
         type: 'fileRef',
         path: refPath
-        }
-        inputArray.push({ key: (prefix ? (prefix + '/') : '') + name, title: name, extraInfo, isLeaf: true})
+      }
+      inputArray.push({ key: (prefix ? (prefix + '/') : '') + name, title: name, extraInfo, isLeaf: true })
     }
     // If master.json file exists in inputItem
-    if (inputItem.hasOwnProperty(MASTERFILE_NAME)) {
-        inputItem[MASTERFILE_NAME].content.order.forEach(orderItem => {
-          if(orderItem.type === 'file' || orderItem.type === 'folder') {
-              actionFileOrFolder(orderItem.name, { type: orderItem.type })
-          } else if(orderItem.type === 'fileRef') {
-              actionFileRef(orderItem.name, orderItem.path)
-          }
-        })
-        // Add missing files in MASTERFILE
-        for (const fileOrFolderItem in inputItem) {
-          if (fileOrFolderItem !== MASTERFILE_NAME && inputItem[MASTERFILE_NAME].content.order.find(item => (item.name === fileOrFolderItem)) === undefined) {
-            actionFileOrFolder(fileOrFolderItem)
-          }
+    if (Object.prototype.hasOwnProperty.call(inputItem, MASTERFILE_NAME)) {
+      inputItem[MASTERFILE_NAME].content.order.forEach(orderItem => {
+        if (orderItem.type === 'file' || orderItem.type === 'folder') {
+          actionFileOrFolder(orderItem.name, { type: orderItem.type })
+        } else if (orderItem.type === 'fileRef') {
+          actionFileRef(orderItem.name, orderItem.path)
         }
-
-    } else {
-        for (const fileOrFolderItem in inputItem) {
+      })
+      // Add missing files in MASTERFILE
+      for (const fileOrFolderItem in inputItem) {
+        if (fileOrFolderItem !== MASTERFILE_NAME && inputItem[MASTERFILE_NAME].content.order.find(item => (item.name === fileOrFolderItem)) === undefined) {
           actionFileOrFolder(fileOrFolderItem)
         }
+      }
+    } else {
+      for (const fileOrFolderItem in inputItem) {
+        actionFileOrFolder(fileOrFolderItem)
+      }
     }
   }
   const treeDataArray = []
@@ -108,7 +106,7 @@ const findNodeFromAbsolutePath = (path, folderData) => {
   // Get the content of the corresponding node based on the absolute path from this.state.folderData
   const pathArray = path.split('/')
   let children = folderData
-  for (let i=0; i<pathArray.length - 1; i++) {
+  for (let i = 0; i < pathArray.length - 1; i++) {
     // Check if the key exists in the children
     const findNode = children.find(item => (item.title === pathArray[i]))
     if (findNode) {
@@ -133,15 +131,15 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
   const basePathArray = refNode.key.split('/')
   const refPathArray = refNode.extraInfo.path.split('/')
   let absolutePath = ''
-  if (refPathArray[0] == '') { // If the path is already absolute path
+  if (refPathArray[0] === '') { // If the path is already absolute path
     absolutePath = refPathArray.slice(1).join('/') // Just remove the starting slash
-  } else if (refPathArray[0] == '.') {
+  } else if (refPathArray[0] === '.') {
     absolutePath = basePathArray.slice(0, -1).join('/') + '/' + refPathArray.slice(1).join('/')
-  } else if (refPathArray[0] == '..') {
+  } else if (refPathArray[0] === '..') {
     // Count the double dots
     let doubleDotCount
-    for (doubleDotCount=0; doubleDotCount<refPathArray.length; doubleDotCount++) {
-      if (refPathArray[doubleDotCount] != '..') {
+    for (doubleDotCount = 0; doubleDotCount < refPathArray.length; doubleDotCount++) {
+      if (refPathArray[doubleDotCount] !== '..') {
         break
       }
     }
@@ -149,19 +147,18 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
     if ((basePathArray.length - 1) < doubleDotCount) {
       return null
     }
-    const newBasePath = basePathArray.slice(0, -1-doubleDotCount).join('/')
-    absolutePath = (newBasePath? (newBasePath + '/') : '') + refPathArray.slice(doubleDotCount).join('/')
-
+    const newBasePath = basePathArray.slice(0, -1 - doubleDotCount).join('/')
+    absolutePath = (newBasePath ? (newBasePath + '/') : '') + refPathArray.slice(doubleDotCount).join('/')
   } else {
     absolutePath = basePathArray.slice(0, -1).join('/') + '/' + refPathArray.join('/')
   }
 
   return absolutePath
-} 
+}
 
 const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFiles, startIndex) => {
-  var newTestCases = testCases
-  for (let i=0; i<nodeChildren.length; i++) {
+  let newTestCases = testCases
+  for (let i = 0; i < nodeChildren.length; i++) {
     if (nodeChildren[i].isLeaf) {
       if (selectedFiles && !selectedFiles.includes(nodeChildren[i].key)) {
         continue
@@ -177,10 +174,10 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
           }
         }
       } else {
-        templateContent = nodeChildren[i].content;
+        templateContent = nodeChildren[i].content
       }
       try {
-        templateContent.test_cases = templateContent.test_cases
+        // templateContent.test_cases = templateContent.test_cases
         // templateContent.test_cases = templateContent.test_cases.map((testCase, index) => {
         //   const { id, ...remainingProps } = testCase
         //   return {
@@ -190,9 +187,9 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
         // })
         startIndex = startIndex + templateContent.test_cases.length
         newTestCases = newTestCases.concat(templateContent.test_cases)
-      } catch(err) {
+      } catch (err) {
         console.log(err.message)
-        break;
+        break
       }
     } else {
       if (nodeChildren[i].children) {
@@ -205,20 +202,20 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
 }
 
 const getTestCases = (folderData, selectedFiles = null) => {
-  var testCases = []
+  let testCases = []
   testCases = addChildrenToTestCases(folderData, folderData, testCases, selectedFiles, 0)
   return testCases
 }
 
 const sequenceTestCases = (testCases) => {
-  for (let i=0; i < testCases.length; i++) {
+  for (let i = 0; i < testCases.length; i++) {
     testCases[i].id = i + 1
   }
 }
 
 module.exports = {
-    getTestCases,
-    getFolderData,
-    sequenceTestCases,
-    findNodeFromAbsolutePath
+  getTestCases,
+  getFolderData,
+  sequenceTestCases,
+  findNodeFromAbsolutePath
 }
