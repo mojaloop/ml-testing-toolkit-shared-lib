@@ -156,7 +156,17 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
   return absolutePath
 }
 
-const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFiles, startIndex) => {
+const getLabels = (currentLabels = [], newLabels = []) => {
+  const labels = (currentLabels && currentLabels.length > 0) ? [...currentLabels] : []
+  newLabels.forEach(label => {
+    if (!currentLabels.includes(label)) {
+      labels.push(label)
+    }
+  });
+  return labels
+}
+
+const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFiles, labels, startIndex) => {
   let newTestCases = testCases
   for (let i = 0; i < nodeChildren.length; i++) {
     if (nodeChildren[i].isLeaf) {
@@ -185,6 +195,15 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
         //     ...remainingProps
         //   }
         // })
+        templateContent.test_cases = templateContent.test_cases.map((testCase) => {
+          testCase.fileInfo = {
+            path: nodeChildren[i].key
+          }
+          if (labels && labels.length > 0 && nodeChildren[i].extraInfo.labels && nodeChildren[i].extraInfo.labels.length > 0) {
+            testCase.fileInfo.labels = getLabels(labels, nodeChildren[i].extraInfo.labels)
+          }
+          return testCase
+        })
         startIndex = startIndex + templateContent.test_cases.length
         newTestCases = newTestCases.concat(templateContent.test_cases)
       } catch (err) {
@@ -194,7 +213,7 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
     } else {
       if (nodeChildren[i].children) {
         // console.log('The node has children', nodeChildren[i].children, newTestCases)
-        newTestCases = addChildrenToTestCases(folderData, nodeChildren[i].children, newTestCases, selectedFiles, startIndex)
+        newTestCases = addChildrenToTestCases(folderData, nodeChildren[i].children, newTestCases, selectedFiles, getLabels(labels, nodeChildren[i].extraInfo.labels), startIndex)
       }
     }
   }
@@ -203,7 +222,7 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
 
 const getTestCases = (folderData, selectedFiles = null) => {
   let testCases = []
-  testCases = addChildrenToTestCases(folderData, folderData, testCases, selectedFiles, 0)
+  testCases = addChildrenToTestCases(folderData, folderData, testCases, selectedFiles, null, 0)
   return testCases
 }
 
