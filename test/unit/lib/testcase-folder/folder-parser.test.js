@@ -96,6 +96,42 @@ const sampleFolderRawData = [
   }
 ]
 
+const sampleFolderRawDataWithLabels = [
+  {
+    name: 'name1',
+    path: 'name1',
+    size: 123,
+    modified: 'modified1',
+    content: { name: 'template1', test_cases: [sampleTestCase] }
+  },
+  {
+    name: 'name2',
+    path: 'name2',
+    size: 123,
+    modified: 'modified2',
+    content: { name: 'template2', test_cases: [sampleTestCase] }
+  },
+  {
+    name: 'master.json',
+    path: 'master.json',
+    size: 123,
+    modified: 'modified4',
+    content: {
+      order: [
+        {
+          name: 'name1',
+          type: 'file',
+          labels: ['p2p']
+        },
+        {
+          name: 'name2',
+          type: 'file'
+        }
+      ]
+    }
+  }
+]
+
 const sampleFolderRawDataWithMultipleFolderLevels = [
   {
     name: 'name1',
@@ -231,6 +267,10 @@ const sampleWrongFolderRawDataWithWithUnknownType = [
 
 const sampleSelectedFiles = [
   'path1'
+]
+
+const sampleSelectedLabels = [
+  'p2p'
 ]
 
 const sampleSelectedFilesWrongPath = [
@@ -381,6 +421,18 @@ describe('FolderParser', () => {
       // First get the folderData
       const folderData = FolderParser.getFolderData(sampleFolderRawData)
       const testCases = FolderParser.getTestCases(folderData, sampleSelectedFiles)
+      expect(Array.isArray(testCases)).toBe(true)
+      expect(testCases.length).toEqual(1)
+      // Validate the first test case
+      expect(testCases[0]).toHaveProperty('id')
+      expect(testCases[0].id).toEqual(1)
+      expect(testCases[0]).toHaveProperty('name')
+      expect(testCases[0].name).toEqual('Test Case Name')
+    })
+    it('getTestCases with selected files and selectedLabels should return proper test cases', async () => {
+      // First get the folderData
+      const folderData = FolderParser.getFolderData(sampleFolderRawDataWithLabels)
+      const testCases = FolderParser.getTestCases(folderData, null, sampleSelectedLabels)
       expect(Array.isArray(testCases)).toBe(true)
       expect(testCases.length).toEqual(1)
       // Validate the first test case

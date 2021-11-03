@@ -76,7 +76,13 @@ const convertToFolderNestedArray = (folderRawData) => {
     if (Object.prototype.hasOwnProperty.call(inputItem, MASTERFILE_NAME)) {
       inputItem[MASTERFILE_NAME].content.order.forEach(orderItem => {
         if (orderItem.type === 'file' || orderItem.type === 'folder') {
-          actionFileOrFolder(orderItem.name, { type: orderItem.type, labels: orderItem.labels })
+          const extraInfo = {
+            type: orderItem.type
+          } 
+          if (orderItem.labels) {
+            extraInfo.labels = orderItem.labels
+          }
+          actionFileOrFolder(orderItem.name, extraInfo)
         } else if (orderItem.type === 'fileRef') {
           actionFileRef(orderItem.name, orderItem.path)
         }
@@ -156,7 +162,8 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
   return absolutePath
 }
 
-const getLabels = (currentLabels = [], newLabels = []) => {
+const getLabels = (currentLabels, newLabels = []) => {
+  currentLabels = currentLabels ? currentLabels : []
   const labels = (currentLabels && currentLabels.length > 0) ? [...currentLabels] : []
   newLabels.forEach(label => {
     if (!currentLabels.includes(label)) {
