@@ -166,7 +166,7 @@ const getLabels = (currentLabels = [], newLabels = []) => {
   return labels
 }
 
-const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFiles, labels, startIndex) => {
+const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFiles, selectedLabels, labels) => {
   let newTestCases = testCases
   for (let i = 0; i < nodeChildren.length; i++) {
     if (nodeChildren[i].isLeaf) {
@@ -199,13 +199,32 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
           testCase.fileInfo = {
             path: nodeChildren[i].key
           }
-          if (labels && labels.length > 0 && nodeChildren[i].extraInfo.labels && nodeChildren[i].extraInfo.labels.length > 0) {
+          if ((labels && labels.length > 0) || (nodeChildren[i].extraInfo.labels && nodeChildren[i].extraInfo.labels.length > 0)) {
             testCase.fileInfo.labels = getLabels(labels, nodeChildren[i].extraInfo.labels)
+          }
+          if (selectedLabels && selectedLabels.length > 0) {
+            let isSelected = false
+            if (testCase.fileInfo.labels && testCase.fileInfo.labels.length > 0) {
+              for (let j = 0; j < testCase.fileInfo.labels.length; j++) {
+                const l = testCase.fileInfo.labels[j];
+                if (selectedLabels.includes(l)) {
+                  isSelected = true
+                  break
+                }
+              }
+            }
+            if (!isSelected) {
+              return null
+            }
           }
           return testCase
         })
-        startIndex = startIndex + templateContent.test_cases.length
-        newTestCases = newTestCases.concat(templateContent.test_cases)
+        if (selectedLabels && selectedLabels.length > 0) {
+          templateContent.test_cases = templateContent.test_cases.filter((testcase) => testcase != null)
+        }
+        if (templateContent.test_cases && templateContent.test_cases.length > 0) {
+          newTestCases = newTestCases.concat(templateContent.test_cases)
+        }
       } catch (err) {
         console.log(err.message)
         break
@@ -213,16 +232,16 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
     } else {
       if (nodeChildren[i].children) {
         // console.log('The node has children', nodeChildren[i].children, newTestCases)
-        newTestCases = addChildrenToTestCases(folderData, nodeChildren[i].children, newTestCases, selectedFiles, getLabels(labels, nodeChildren[i].extraInfo.labels), startIndex)
+        newTestCases = addChildrenToTestCases(folderData, nodeChildren[i].children, newTestCases, selectedFiles, selectedLabels, getLabels(labels, nodeChildren[i].extraInfo.labels))
       }
     }
   }
   return newTestCases
 }
 
-const getTestCases = (folderData, selectedFiles = null) => {
+const getTestCases = (folderData, selectedFiles = null, selectedLabels = null) => {
   let testCases = []
-  testCases = addChildrenToTestCases(folderData, folderData, testCases, selectedFiles, null, 0)
+  testCases = addChildrenToTestCases(folderData, folderData, testCases, selectedFiles, selectedLabels, null)
   return testCases
 }
 
