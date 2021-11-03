@@ -76,7 +76,13 @@ const convertToFolderNestedArray = (folderRawData) => {
     if (Object.prototype.hasOwnProperty.call(inputItem, MASTERFILE_NAME)) {
       inputItem[MASTERFILE_NAME].content.order.forEach(orderItem => {
         if (orderItem.type === 'file' || orderItem.type === 'folder') {
-          actionFileOrFolder(orderItem.name, { type: orderItem.type })
+          const extraInfo = {
+            type: orderItem.type
+          } 
+          if (orderItem.labels) {
+            extraInfo.labels = orderItem.labels
+          }
+          actionFileOrFolder(orderItem.name, extraInfo)
         } else if (orderItem.type === 'fileRef') {
           actionFileRef(orderItem.name, orderItem.path)
         }
@@ -156,7 +162,18 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
   return absolutePath
 }
 
-const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFiles, startIndex) => {
+const getLabels = (currentLabels, newLabels = []) => {
+  currentLabels = currentLabels ? currentLabels : []
+  const labels = (currentLabels && currentLabels.length > 0) ? [...currentLabels] : []
+  newLabels.forEach(label => {
+    if (!currentLabels.includes(label)) {
+      labels.push(label)
+    }
+  });
+  return labels
+}
+
+const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFiles, selectedLabels, labels) => {
   let newTestCases = testCases
   for (let i = 0; i < nodeChildren.length; i++) {
     if (nodeChildren[i].isLeaf) {
@@ -185,8 +202,36 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
         //     ...remainingProps
         //   }
         // })
-        startIndex = startIndex + templateContent.test_cases.length
-        newTestCases = newTestCases.concat(templateContent.test_cases)
+        templateContent.test_cases = templateContent.test_cases.map((testCase) => {
+          testCase.fileInfo = {
+            path: nodeChildren[i].key
+          }
+          if ((labels && labels.length > 0) || (nodeChildren[i].extraInfo.labels && nodeChildren[i].extraInfo.labels.length > 0)) {
+            testCase.fileInfo.labels = getLabels(labels, nodeChildren[i].extraInfo.labels)
+          }
+          if (selectedLabels && selectedLabels.length > 0) {
+            let isSelected = false
+            if (testCase.fileInfo.labels && testCase.fileInfo.labels.length > 0) {
+              for (let j = 0; j < testCase.fileInfo.labels.length; j++) {
+                const l = testCase.fileInfo.labels[j];
+                if (selectedLabels.includes(l)) {
+                  isSelected = true
+                  break
+                }
+              }
+            }
+            if (!isSelected) {
+              return null
+            }
+          }
+          return testCase
+        })
+        if (selectedLabels && selectedLabels.length > 0) {
+          templateContent.test_cases = templateContent.test_cases.filter((testcase) => testcase != null)
+        }
+        if (templateContent.test_cases && templateContent.test_cases.length > 0) {
+          newTestCases = newTestCases.concat(templateContent.test_cases)
+        }
       } catch (err) {
         console.log(err.message)
         break
@@ -194,16 +239,16 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
     } else {
       if (nodeChildren[i].children) {
         // console.log('The node has children', nodeChildren[i].children, newTestCases)
-        newTestCases = addChildrenToTestCases(folderData, nodeChildren[i].children, newTestCases, selectedFiles, startIndex)
+        newTestCases = addChildrenToTestCases(folderData, nodeChildren[i].children, newTestCases, selectedFiles, selectedLabels, getLabels(labels, nodeChildren[i].extraInfo.labels))
       }
     }
   }
   return newTestCases
 }
 
-const getTestCases = (folderData, selectedFiles = null) => {
+const getTestCases = (folderData, selectedFiles = null, selectedLabels = null) => {
   let testCases = []
-  testCases = addChildrenToTestCases(folderData, folderData, testCases, selectedFiles, 0)
+  testCases = addChildrenToTestCases(folderData, folderData, testCases, selectedFiles, selectedLabels, null)
   return testCases
 }
 
