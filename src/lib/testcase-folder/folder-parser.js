@@ -78,7 +78,7 @@ const convertToFolderNestedArray = (folderRawData) => {
         if (orderItem.type === 'file' || orderItem.type === 'folder') {
           const extraInfo = {
             type: orderItem.type
-          } 
+          }
           if (orderItem.labels) {
             extraInfo.labels = orderItem.labels
           }
@@ -162,14 +162,13 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
   return absolutePath
 }
 
-const getLabels = (currentLabels, newLabels = []) => {
-  currentLabels = currentLabels ? currentLabels : []
+const getLabels = (currentLabels = [], newLabels = []) => {
   const labels = (currentLabels && currentLabels.length > 0) ? [...currentLabels] : []
   newLabels.forEach(label => {
     if (!currentLabels.includes(label)) {
       labels.push(label)
     }
-  });
+  })
   return labels
 }
 
@@ -213,7 +212,7 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
             let isSelected = false
             if (testCase.fileInfo.labels && testCase.fileInfo.labels.length > 0) {
               for (let j = 0; j < testCase.fileInfo.labels.length; j++) {
-                const l = testCase.fileInfo.labels[j];
+                const l = testCase.fileInfo.labels[j]
                 if (selectedLabels.includes(l)) {
                   isSelected = true
                   break
