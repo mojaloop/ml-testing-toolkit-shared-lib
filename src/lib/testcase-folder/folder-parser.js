@@ -61,7 +61,7 @@ const convertToFolderNestedArray = (folderRawData) => {
           const children = []
           processFileOrFolder(inputItem[fileOrFolderItem], children, (prefix ? (prefix + '/') : '') + fileOrFolderItem)
           extraInfo = extraInfo || { type: 'folder' }
-          inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, extraInfo, children: children })
+          inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, extraInfo, children })
         }
       }
     }
@@ -162,7 +162,9 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
   return absolutePath
 }
 
-const getLabels = (currentLabels = [], newLabels = []) => {
+const getLabels = (currentLabels, newLabels = []) => {
+  // eslint-disable-next-line no-unneeded-ternary
+  currentLabels = currentLabels ? currentLabels : []
   const labels = (currentLabels && currentLabels.length > 0) ? [...currentLabels] : []
   newLabels.forEach(label => {
     if (!currentLabels.includes(label)) {
