@@ -3,5 +3,8 @@
   // audit-ci supports reading JSON, JSONC, and JSON5 config files.
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
-  "allowlist": []
+  "allowlist": [
+    // Unable to downgrade due to breaking change: glob-parent before 6.0.1 vulnerable to Regular Expression Denial of Service (ReDoS) - https://github.com/advisories/GHSA-cj88-88mr-972w
+    "GHSA-cj88-88mr-972w"
+  ]
 }

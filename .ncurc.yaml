@@ -1,0 +1,5 @@
+reject: [
+  # Downgraded to 5.5.3 - Reason: removal of functional code in faker.js - https://github.com/advisories/GHSA-5w9c-rv96-fr7g
+  "faker"
+
+]
