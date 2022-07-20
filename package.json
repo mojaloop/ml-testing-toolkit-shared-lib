@@ -63,9 +63,9 @@
     "standard-version": "^9.5.0"
   },
   "standard-version": {
-      "scripts": {
-          "postchangelog": "replace '\\[mojaloop/#(\\d+)\\]\\(https://github.com/mojaloop/(.*)/issues/(\\d+)\\)' '[mojaloop/#$1](https://github.com/mojaloop/project/issues/$1)' CHANGELOG.md"
-      }
+    "scripts": {
+      "postchangelog": "replace '\\[mojaloop/#(\\d+)\\]\\(https://github.com/mojaloop/(.*)/issues/(\\d+)\\)' '[mojaloop/#$1](https://github.com/mojaloop/project/issues/$1)' CHANGELOG.md"
+    }
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -74,10 +74,5 @@
     "env": [
       "jest"
     ]
-  },
-  "standard-version": {
-    "scripts": {
-      "postchangelog": "replace '\\[mojaloop/#(\\d+)\\]\\(https://github.com/mojaloop/(.*)/issues/(\\d+)\\)' '[mojaloop/#$1](https://github.com/mojaloop/project/issues/$1)' CHANGELOG.md"
-    }
   }
 }
