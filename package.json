@@ -23,7 +23,9 @@
     "cover": "npx nyc --all report --reporter=lcov npm run test",
     "audit:check": "npx audit-ci --config ./audit-ci.jsonc",
     "dep:check": "npx ncu -e 2",
-    "dep:update": "npx ncu -u"
+    "dep:update": "npx ncu -u",
+    "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
+    "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
   "repository": {
     "type": "git",
@@ -54,7 +56,8 @@
     "jest-junit": "14.0.0",
     "npm-check-updates": "15.3.4",
     "pre-commit": "^1.2.2",
-    "standard": "^17.0.0"
+    "standard": "^17.0.0",
+    "standard-version": "^9.5.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
@@ -63,5 +66,10 @@
     "env": [
       "jest"
     ]
+  },
+  "standard-version": {
+    "scripts": {
+      "postchangelog": "replace '\\[mojaloop/#(\\d+)\\]\\(https://github.com/mojaloop/(.*)/issues/(\\d+)\\)' '[mojaloop/#$1](https://github.com/mojaloop/project/issues/$1)' CHANGELOG.md"
+    }
   }
 }
