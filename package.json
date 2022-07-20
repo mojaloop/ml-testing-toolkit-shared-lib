@@ -3,6 +3,23 @@
   "version": "13.0.0-snapshot.0",
   "description": "Shared library for ml-testing-toolkit re-usable functions",
   "main": "src/index.js",
+  "contributors": [
+    "Vijaya Kumar <vijaya.guthi@modusbox.com>",
+    "Miguel de Barros <miguel.debarros@modusbox.com>"
+  ],
+  "engines": {
+    "node": "=16.x"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mojaloop/ml-testing-toolkit-shared-lib.git"
+  },
+  "author": "Vijaya Kumar Guthi, ModusBox Inc.",
+  "bugs": {
+    "url": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues"
+  },
+  "homepage": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib#readme",
   "pre-commit": [
     "lint",
     "dep:check"
@@ -27,20 +44,6 @@
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mojaloop/ml-testing-toolkit-shared-lib.git"
-  },
-  "author": "Vijaya Kumar Guthi, ModusBox Inc.",
-  "contributors": [
-    "Vijaya Kumar <vijaya.guthi@modusbox.com>",
-    "Miguel de Barros <miguel.debarros@modusbox.com>"
-  ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues"
-  },
-  "homepage": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib#readme",
   "dependencies": {
     "ajv": "8.11.0",
     "faker": "5.5.3",
