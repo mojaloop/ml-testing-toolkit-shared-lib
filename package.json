@@ -1,12 +1,28 @@
 {
   "name": "@mojaloop/ml-testing-toolkit-shared-lib",
-  "version": "12.2.0",
+  "version": "13.0.0-snapshot.0",
   "description": "Shared library for ml-testing-toolkit re-usable functions",
   "main": "src/index.js",
+  "contributors": [
+    "Vijaya Kumar <vijaya.guthi@modusbox.com>",
+    "Miguel de Barros <miguel.debarros@modusbox.com>"
+  ],
+  "engines": {
+    "node": "=16.x"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mojaloop/ml-testing-toolkit-shared-lib.git"
+  },
+  "author": "Vijaya Kumar Guthi, ModusBox Inc.",
+  "bugs": {
+    "url": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues"
+  },
+  "homepage": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib#readme",
   "pre-commit": [
     "lint",
-    "dep:check",
-    "test:unit"
+    "dep:check"
   ],
   "scripts": {
     "start": "node src/index.js",
@@ -22,40 +38,34 @@
     "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.js'",
     "test:integration": "./test/integration-runner.sh ",
     "cover": "npx nyc --all report --reporter=lcov npm run test",
-    "audit:resolve": "SHELL=sh resolve-audit",
-    "audit:check": "SHELL=sh check-audit",
+    "audit:check": "npx audit-ci --config ./audit-ci.jsonc",
     "dep:check": "npx ncu -e 2",
-    "dep:update": "npx ncu -u"
+    "dep:update": "npx ncu -u",
+    "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
+    "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mojaloop/ml-testing-toolkit-shared-lib.git"
-  },
-  "author": "Vijaya Kumar Guthi, ModusBox Inc.",
-  "contributors": [
-    "Vijaya Kumar <vijaya.guthi@modusbox.com>",
-    "Miguel de Barros <miguel.debarros@modusbox.com>"
-  ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues"
-  },
-  "homepage": "https://github.com/mojaloop/ml-testing-toolkit-shared-lib#readme",
   "dependencies": {
-    "ajv": "8.5.0",
+    "ajv": "8.11.0",
     "faker": "5.5.3",
-    "json-schema-faker": "0.5.0-rcv.34",
-    "json-schema-ref-parser": "9.0.7",
+    "json-schema-faker": "0.5.0-rcv.44",
+    "json-schema-ref-parser": "9.0.9",
     "lodash": "4.17.21",
     "node-dir": "0.1.17"
   },
   "devDependencies": {
-    "@types/jest": "26.0.23",
-    "jest": "27.0.4",
-    "jest-junit": "12.1.0",
-    "npm-audit-resolver": "2.3.1",
-    "npm-check-updates": "11.6.0",
-    "standard": "^16.0.3"
+    "@types/jest": "28.1.6",
+    "audit-ci": "^6.3.0",
+    "jest": "28.1.3",
+    "jest-junit": "14.0.0",
+    "npm-check-updates": "15.3.4",
+    "pre-commit": "^1.2.2",
+    "standard": "^17.0.0",
+    "standard-version": "^9.5.0"
+  },
+  "standard-version": {
+    "scripts": {
+      "postchangelog": "replace '\\[mojaloop/#(\\d+)\\]\\(https://github.com/mojaloop/(.*)/issues/(\\d+)\\)' '[mojaloop/#$1](https://github.com/mojaloop/project/issues/$1)' CHANGELOG.md"
+    }
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"

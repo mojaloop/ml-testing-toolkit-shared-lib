@@ -61,7 +61,7 @@ const convertToFolderNestedArray = (folderRawData) => {
           const children = []
           processFileOrFolder(inputItem[fileOrFolderItem], children, (prefix ? (prefix + '/') : '') + fileOrFolderItem)
           extraInfo = extraInfo || { type: 'folder' }
-          inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, extraInfo, children: children })
+          inputArray.push({ key: (prefix ? (prefix + '/') : '') + fileOrFolderItem, title: fileOrFolderItem, extraInfo, children })
         }
       }
     }
@@ -78,7 +78,7 @@ const convertToFolderNestedArray = (folderRawData) => {
         if (orderItem.type === 'file' || orderItem.type === 'folder') {
           const extraInfo = {
             type: orderItem.type
-          } 
+          }
           if (orderItem.labels) {
             extraInfo.labels = orderItem.labels
           }
@@ -163,13 +163,14 @@ const getAbsolutePathOfRelativeFileRef = (refNode) => {
 }
 
 const getLabels = (currentLabels, newLabels = []) => {
+  // eslint-disable-next-line no-unneeded-ternary
   currentLabels = currentLabels ? currentLabels : []
   const labels = (currentLabels && currentLabels.length > 0) ? [...currentLabels] : []
   newLabels.forEach(label => {
     if (!currentLabels.includes(label)) {
       labels.push(label)
     }
-  });
+  })
   return labels
 }
 
@@ -213,7 +214,7 @@ const addChildrenToTestCases = (folderData, nodeChildren, testCases, selectedFil
             let isSelected = false
             if (testCase.fileInfo.labels && testCase.fileInfo.labels.length > 0) {
               for (let j = 0; j < testCase.fileInfo.labels.length; j++) {
-                const l = testCase.fileInfo.labels[j];
+                const l = testCase.fileInfo.labels[j]
                 if (selectedLabels.includes(l)) {
                   isSelected = true
                   break
