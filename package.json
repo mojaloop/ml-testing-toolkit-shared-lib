@@ -59,6 +59,7 @@
     "jest-junit": "14.0.0",
     "npm-check-updates": "15.3.4",
     "pre-commit": "^1.2.2",
+    "replace": "^1.2.1",
     "standard": "^17.0.0",
     "standard-version": "^9.5.0"
   },
