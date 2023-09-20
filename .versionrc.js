@@ -1,5 +1,6 @@
-{
-  "types": [
+module.exports = {
+  header: '# Changelog: [mojaloop/als-consent-oracle](https://github.com/mojaloop/als-consent-oracle)',
+  types: [
     {"type": "feat", "section": "Features"},
     {"type": "fix", "section": "Bug Fixes"},
     {"type": "docs", "section": "Documentation"},
@@ -13,3 +14,4 @@
     {"type": "revert", "section": "Reverts"}
   ]
 }
+
