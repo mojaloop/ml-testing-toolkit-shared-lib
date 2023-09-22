@@ -21,7 +21,7 @@ defaults_docker_Dependencies: &defaults_docker_Dependencies |
     apk --no-cache add ca-certificates
     apk --no-cache add curl
     apk --no-cache add openssh-client
-    apk add --no-cache -t build-dependencies make gcc g++ python3 libtool autoconf automake jq bash
+    apk --no-cache add -t build-dependencies make gcc g++ python3 libtool autoconf automake jq
 
 defaults_awsCliDependencies: &defaults_awsCliDependencies |
     apk --no-cache add aws-cli
@@ -35,7 +35,6 @@ defaults_license_scanner: &defaults_license_scanner
 defaults_npm_auth: &defaults_npm_auth
   name: Update NPM registry auth token
   command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-
 
 defaults_npm_publish_release: &defaults_npm_publish_release
   name: Publish NPM $RELEASE_TAG artifact
