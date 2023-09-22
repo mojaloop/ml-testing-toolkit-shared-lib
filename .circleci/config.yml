@@ -400,7 +400,7 @@ jobs:
           template: SLACK_TEMP_RELEASE_FAILURE
 
   publish:
-    executor: default-machine
+    executor: default-docker
     environment:
       <<: *defaults_environment
     steps:
