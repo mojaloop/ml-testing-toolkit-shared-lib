@@ -401,7 +401,6 @@ jobs:
 
   publish:
     executor: default-machine
-    shell: "/bin/bash -eo pipefail"
     environment:
       <<: *defaults_environment
     steps:
@@ -441,8 +440,7 @@ jobs:
           template: SLACK_TEMP_RELEASE_FAILURE
 
   publish-snapshot:
-    executor: default-machine
-    shell: "/bin/bash -eo pipefail"
+    executor: default-docker
     environment:
       <<: *defaults_environment
     steps:
