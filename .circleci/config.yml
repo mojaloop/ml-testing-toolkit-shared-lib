@@ -568,7 +568,6 @@ workflows:
       - release:
           context: org-global
           requires:
-            - pr-tools/pr-title-check
             - test-lint
             - test-unit
             - test-coverage
@@ -591,7 +590,6 @@ workflows:
       - publish:
           context: org-global
           requires:
-            - pr-tools/pr-title-check
             - test-lint
             - test-unit
             - test-coverage
@@ -606,7 +604,6 @@ workflows:
       - publish-snapshot:
           context: org-global
           requires:
-            - pr-tools/pr-title-check
             - test-lint
             - test-unit
             - test-coverage
