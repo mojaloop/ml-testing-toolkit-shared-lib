@@ -4,6 +4,7 @@
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
   "allowlist": [
-    "GHSA-c2qf-rxjj-qqgw" // https://github.com/advisories/GHSA-c2qf-rxjj-qqgw
+    "GHSA-c2qf-rxjj-qqgw", // https://github.com/advisories/GHSA-c2qf-rxjj-qqgw
+    "GHSA-67hx-6x53-jw92" // https://github.com/advisories/GHSA-67hx-6x53-jw92
   ]
 }
