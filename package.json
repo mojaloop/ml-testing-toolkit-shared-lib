@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/ml-testing-toolkit-shared-lib",
-  "version": "14.0.0",
+  "version": "14.0.1",
   "description": "Shared library for ml-testing-toolkit re-usable functions",
   "main": "src/index.js",
   "contributors": [
