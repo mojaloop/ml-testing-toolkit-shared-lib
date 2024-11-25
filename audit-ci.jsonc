@@ -5,6 +5,7 @@
   "moderate": true,
   "allowlist": [
     "GHSA-c2qf-rxjj-qqgw", // https://github.com/advisories/GHSA-c2qf-rxjj-qqgw
-    "GHSA-67hx-6x53-jw92" // https://github.com/advisories/GHSA-67hx-6x53-jw92
+    "GHSA-67hx-6x53-jw92", // https://github.com/advisories/GHSA-67hx-6x53-jw92
+    "GHSA-3xgq-45jj-v275" // https://github.com/advisories/GHSA-3xgq-45jj-v275
   ]
 }
