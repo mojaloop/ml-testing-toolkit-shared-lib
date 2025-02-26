@@ -170,13 +170,47 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
   return fakedResponse
 }
 
-const generateMockOperation = async (method, name, data, jsfRefs) => {
+const handleBulkOperations = async (method, name, data, jsfRefs, response, originalRequestBody) => {
   const requestSchema = findRequestSchema(data.requestBody)
   // Create a new copy of object without copying by references
   const newRequestSchema = JSON.parse(JSON.stringify(requestSchema))
+
   jsfRefs.forEach(ref => {
     const convertedId = ref.id.replace(/\./g, '.properties.')
+    
+    // Just keeping it simple at the moment for a single level of an array in the properties
+    const targetObject = _.get(newRequestSchema.properties, convertedId.includes('items') ? convertedId.replace(/\.properties/, '') : convertedId)
+    
+    if (targetObject) {
+      targetObject.$ref = ref.id
+      if (ref.pattern) {
+        delete targetObject.pattern
+        delete targetObject.enum
+      }
+    }
+  })
+
+  const fakedQuotes = [];
+
+  for(let i=0 ; i<originalRequestBody.individualQuotes.length ; i+=1) {
+    const fakedQuote = await jsf.resolve(newRequestSchema, jsfRefs);
+    fakedQuotes.push(fakedQuote.individualQuoteResults[0])
+  }
+
+  return fakedQuotes;
+}
+
+const generateMockOperation = async (method, name, data, jsfRefs, originalRequestBody) => {
+  const requestSchema = findRequestSchema(data.requestBody)
+  // Create a new copy of object without copying by references
+  const newRequestSchema = JSON.parse(JSON.stringify(requestSchema))
+
+  jsfRefs.forEach(ref => {
+    const convertedId = ref.id.replace(/\./g, '.properties.')
+    
+    // Just keeping it simple at the moment for a single level of an array in the properties
     const targetObject = _.get(newRequestSchema.properties, convertedId)
+    
     if (targetObject) {
       targetObject.$ref = ref.id
       if (ref.pattern) {
@@ -187,6 +221,15 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
   })
 
   const fakedResponse = await jsf.resolve(newRequestSchema, jsfRefs)
+
+  switch (data.operationId) {
+    case "BulkQuotesByID1": {
+    fakedResponse.individualQuoteResults = await handleBulkOperations(method, name, data, jsfRefs, fakedResponse, originalRequestBody)
+      break;
+    }
+    default:
+      console.log(`No special operationId found, skip.`);
+  }
 
   return fakedResponse
 }
@@ -266,11 +309,11 @@ class OpenApiRequestGenerator {
     this.schema = await loadYamlFile(schemaPath)
   }
 
-  async generateRequestBody (path, httpMethod, jsfRefs = []) {
+  async generateRequestBody (path, httpMethod, jsfRefs = [], originalRequestBody) {
     const pathValue = this.schema.paths[path]
     const operation = pathValue[httpMethod]
     const id = operation.operationId || operation.summary
-    return generateMockOperation(httpMethod, id, operation, jsfRefs)
+    return generateMockOperation(httpMethod, id, operation, jsfRefs, originalRequestBody)
   }
 
   async generateRequestHeaders (path, httpMethod, jsfRefs = []) {
