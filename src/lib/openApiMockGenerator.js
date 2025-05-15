@@ -123,8 +123,8 @@ const samplerOptions = {
         return faker.helpers.arrayElement(['RECEIVED', 'RESERVED', 'COMMITTED', 'ABORTED'])
       }
 
-      // Handle FSP ID
-      if (key === 'fspid' || (parentKey === 'partyidinfo' && key === 'fspid')) {
+      // Handle FSP ID fields (fspid, payerfsp, payeefsp)
+      if (key === 'fspid' || key === 'payerfsp' || key === 'payeefsp' || (parentKey === 'partyidinfo' && key === 'fspid')) {
         return generateFspId()
       }
 
@@ -173,12 +173,42 @@ const samplerOptions = {
         return faker.helpers.arrayElement(['CONSUMER', 'AGENT', 'BUSINESS', 'DEVICE'])
       }
 
-      // Handle name fields (capitalized, single names)
-      if (key === 'name' || /name$/i.test(key)) {
-        // Generate a capitalized first and last name
+      // Handle firstName and lastName fields (single name, capitalized, strictly alphabetic)
+      if (key === 'firstname') {
+        let first
+        do {
+          first = faker.person.firstName()
+          first = `${first.charAt(0).toUpperCase()}${first.slice(1)}`
+        } while (!/^[A-Z][a-z]+$/.test(first))
+        return first
+      }
+      if (key === 'lastname') {
+        let last
+        do {
+          last = faker.person.lastName()
+          last = `${last.charAt(0).toUpperCase()}${last.slice(1)}`
+        } while (!/^[A-Z][a-z]+$/.test(last))
+        return last
+      }
+
+      // Handle name field (full name)
+      if (key === 'name') {
         const first = faker.person.firstName()
         const last = faker.person.lastName()
         return `${first.charAt(0).toUpperCase()}${first.slice(1)} ${last.charAt(0).toUpperCase()}${last.slice(1)}`
+      }
+
+      // Handle complexName (string) to always return a full name (Firstname Lastname)
+      if (key === 'complexname' && schema.type === 'string') {
+        const first = faker.person.firstName()
+        const last = faker.person.lastName()
+        return `${first.charAt(0).toUpperCase()}${first.slice(1)} ${last.charAt(0).toUpperCase()}${last.slice(1)}`
+      }
+
+      // For any other key ending with 'name' (but not 'name', 'firstname', 'lastname', or 'complexname'), generate a single capitalized name.
+      if (/name$/i.test(key) && key !== 'name' && key !== 'firstname' && key !== 'lastname' && key !== 'complexname') {
+        const single = faker.person.firstName()
+        return `${single.charAt(0).toUpperCase()}${single.slice(1)}`
       }
 
       // Fallback to customTypeHandler for any other string field
@@ -704,7 +734,11 @@ function postProcessMock (obj, schema, key = null, jsfRefs = []) {
         if (k.toLowerCase() === 'fspid' && (typeof obj[k] !== 'string' || !/^[A-Z0-9]{1,32}$/.test(obj[k]))) {
           obj[k] = generateFspId()
         }
-        if (k.toLowerCase().endsWith('name') && (typeof obj[k] !== 'string' || !/^[A-Z][a-z]+ [A-Z][a-z]+$/.test(obj[k]))) {
+        // Only apply full name fallback to 'name' field, not firstName, lastName, or complexName
+        if (
+          k.toLowerCase() === 'name' &&
+          (typeof obj[k] !== 'string' || !/^[A-Z][a-z]+ [A-Z][a-z]+$/.test(obj[k]))
+        ) {
           const first = faker.person.firstName()
           const last = faker.person.lastName()
           obj[k] = `${first.charAt(0).toUpperCase()}${first.slice(1)} ${last.charAt(0).toUpperCase()}${last.slice(1)}`
@@ -756,6 +790,7 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
 
 // Update other generateMock functions similarly
 const generateMockResponseBody = async (method, name, data, jsfRefs) => {
+  if (OpenApiRequestGenerator._testForceError === 'generateMockResponseBody') throw new Error('Forced error for test')
   if (!data || !data.responses) {
     return {}
   }
@@ -786,6 +821,10 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
 }
 
 const generateMockHeaders = async (method, name, data, jsfRefs) => {
+  if (OpenApiRequestGenerator._testForceError === 'generateMockHeaders') throw new Error('Forced error for test')
+  if (!data || !Array.isArray(data.parameters)) {
+    return {}
+  }
   const properties = {}
   data.parameters.forEach(param => {
     if (param.in === 'header') {
@@ -806,6 +845,10 @@ const generateMockHeaders = async (method, name, data, jsfRefs) => {
 }
 
 const generateMockQueryParams = async (method, name, data, jsfRefs) => {
+  if (OpenApiRequestGenerator._testForceError === 'generateMockQueryParams') throw new Error('Forced error for test')
+  if (!data || !Array.isArray(data.parameters)) {
+    return {}
+  }
   const properties = {}
   data.parameters.forEach(param => {
     if (param.in === 'query') {
@@ -826,6 +869,10 @@ const generateMockQueryParams = async (method, name, data, jsfRefs) => {
 }
 
 const generateMockPathParams = async (method, name, data, jsfRefs) => {
+  if (OpenApiRequestGenerator._testForceError === 'generateMockPathParams') throw new Error('Forced error for test')
+  if (!data || !Array.isArray(data.parameters)) {
+    return {}
+  }
   const properties = {}
   data.parameters.forEach(param => {
     if (param.in === 'path') {
@@ -949,5 +996,7 @@ class OpenApiRequestGenerator {
     }
   }
 }
+
+OpenApiRequestGenerator._testForceError = null
 
 module.exports = OpenApiRequestGenerator

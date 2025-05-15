@@ -71,7 +71,8 @@
   "overrides": {
     "cross-spawn": "7.0.6",
     "glob": "9.3.5",
-    "rimraf": "5.0.10"
+    "rimraf": "5.0.10",
+    "@babel/helpers": "7.26.10"
   },
   "standard-version": {
     "scripts": {
