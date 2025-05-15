@@ -31,19 +31,37 @@ const _ = require('lodash')
 // const fs = require('fs')
 // const jref = require('json-ref-lite')
 // const yaml = require('js-yaml')
-const faker = require('faker')
-const jsf = require('json-schema-faker')
+const { faker } = require('@faker-js/faker')
+const JSONSchemaSampler = require('@stoplight/json-schema-sampler')
 const $RefParser = require('json-schema-ref-parser')
 const Ajv = require('ajv')
 
-jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence(12)).toString('base64'))
-
-jsf.option({
-  alwaysFakeOptionals: true,
-  ignoreMissingRefs: true,
-  maxItems: 2
-})
-jsf.extend('faker', () => require('faker'))
+// Configure the sampler options to match original jsf behavior
+const samplerOptions = {
+  skipNonRequired: false, // equivalent to alwaysFakeOptionals: true
+  quiet: true,
+  maxSampleDepth: 5,
+  maxItems: 2, // match original jsf option
+  ignoreMissingRefs: true, // match original jsf option
+  // Custom format handlers
+  formatHandlers: {
+    byte: () => Buffer.alloc(faker.lorem.sentence(12)).toString('base64')
+  },
+  // Custom type handlers for more realistic data
+  typeHandlers: {
+    string: (schema) => {
+      if (schema.format === 'date-time') return faker.date.anytime().toISOString()
+      if (schema.format === 'date') return faker.date.anytime().toISOString().split('T')[0]
+      if (schema.format === 'email') return faker.internet.email()
+      if (schema.format === 'uri') return faker.internet.url()
+      if (schema.format === 'uuid') return faker.string.uuid()
+      return faker.lorem.sentence()
+    },
+    number: () => faker.number.int(),
+    integer: () => faker.number.int(),
+    boolean: () => faker.datatype.boolean()
+  }
+}
 
 const ajv = new Ajv({
   strict: false,
@@ -137,30 +155,58 @@ const findRequestSchema = (r) => {
   return _.find(content).schema
 }
 
-const generateMockResponseBody = async (method, name, data, jsfRefs) => {
-  const responseSchema = findResponseSchema(data.responses)
-  // Create a new copy of object without copying by references
-  const newResponseSchema = JSON.parse(JSON.stringify(responseSchema))
+const processRefs = (schema, jsfRefs) => {
+  if (!jsfRefs || !jsfRefs.length) return schema
 
-  if (!newResponseSchema) {
-    return {}
-  }
+  const newSchema = JSON.parse(JSON.stringify(schema))
+
+  // Process each reference
   jsfRefs.forEach(ref => {
-    const convertedId = ref.id.replace(/\.(?!items)/g, '.properties.')
+    // Convert the reference ID to a valid JSON pointer path
+    const path = ref.id.split('.').map(part => {
+      // Escape special characters in JSON pointer
+      return part.replace(/~/g, '~0').replace(/\//g, '~1')
+    }).join('/')
 
-    const targetObject = _.get(newResponseSchema.type === 'array' ? newResponseSchema.items.properties : newResponseSchema.properties, convertedId)
-
-    if (targetObject) {
-      targetObject.$ref = ref.id
-      if (ref.pattern) {
-        delete targetObject.pattern
-        delete targetObject.enum
+    // Handle array items specially
+    if (newSchema.type === 'array' && newSchema.items) {
+      if (newSchema.items.properties) {
+        const targetObject = _.get(newSchema.items.properties, path)
+        if (targetObject) {
+          // Instead of setting $ref, copy the schema properties
+          Object.assign(targetObject, { type: 'string' }) // Default to string type
+          if (ref.pattern) {
+            delete targetObject.pattern
+            delete targetObject.enum
+          }
+        }
+      }
+    } else if (newSchema.properties) {
+      const targetObject = _.get(newSchema.properties, path)
+      if (targetObject) {
+        // Instead of setting $ref, copy the schema properties
+        Object.assign(targetObject, { type: 'string' }) // Default to string type
+        if (ref.pattern) {
+          delete targetObject.pattern
+          delete targetObject.enum
+        }
       }
     }
   })
 
+  return newSchema
+}
+
+const generateMockResponseBody = async (method, name, data, jsfRefs) => {
+  const responseSchema = findResponseSchema(data.responses)
+  if (!responseSchema) {
+    return {}
+  }
+
+  const processedSchema = processRefs(responseSchema, jsfRefs)
   const fakedResponse = {}
-  fakedResponse.body = await jsf.resolve(newResponseSchema, jsfRefs)
+  fakedResponse.body = JSONSchemaSampler.sample(processedSchema, samplerOptions)
+
   for (const key in data.responses) {
     fakedResponse.status = key
     if (key >= 200 && key <= 299) {
@@ -172,88 +218,68 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
 
 const generateMockOperation = async (method, name, data, jsfRefs) => {
   const requestSchema = findRequestSchema(data.requestBody)
-  // Create a new copy of object without copying by references
-  const newRequestSchema = JSON.parse(JSON.stringify(requestSchema))
-  jsfRefs.forEach(ref => {
-    const convertedId = ref.id.replace(/\./g, '.properties.')
-    const targetObject = _.get(newRequestSchema.properties, convertedId)
-    if (targetObject) {
-      targetObject.$ref = ref.id
-      if (ref.pattern) {
-        delete targetObject.pattern
-        delete targetObject.enum
-      }
-    }
-  })
-
-  const fakedResponse = await jsf.resolve(newRequestSchema, jsfRefs)
-
-  return fakedResponse
-}
-
-const generateMockHeaders = async (method, name, data, jsfRefs) => {
-  const headers = {}
-  data.parameters.forEach(param => {
-    if (param.in === 'header') {
-      headers[param.name] = (param.schema && param.schema.type) ? { type: param.schema.type } : {}
-    }
-  })
-  jsfRefs.forEach(ref => {
-    if (headers[ref.id]) {
-      headers[ref.id] = { $ref: ref.id }
-    }
-  })
-
-  if (Object.keys(headers).length === 0) {
+  if (!requestSchema) {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(headers, jsfRefs)
+  const processedSchema = processRefs(requestSchema, jsfRefs)
+  return JSONSchemaSampler.sample(processedSchema, samplerOptions)
+}
 
+const generateMockHeaders = async (method, name, data, jsfRefs) => {
+  const properties = {}
+  data.parameters.forEach(param => {
+    if (param.in === 'header') {
+      properties[param.name] = (param.schema && param.schema.type) ? { type: param.schema.type } : {}
+    }
+  })
+
+  if (Object.keys(properties).length === 0) {
+    return {}
+  }
+
+  const schema = { type: 'object', properties }
+  const processedSchema = processRefs(schema, jsfRefs)
+  let fakedResponse = JSONSchemaSampler.sample(processedSchema, samplerOptions)
+  if (fakedResponse === null) fakedResponse = {}
   return fakedResponse
 }
 
 const generateMockQueryParams = async (method, name, data, jsfRefs) => {
-  const queryParams = {}
+  const properties = {}
   data.parameters.forEach(param => {
     if (param.in === 'query') {
-      queryParams[param.name] = (param.schema) ? { ...param.schema } : {}
-    }
-  })
-  jsfRefs.forEach(ref => {
-    if (queryParams[ref.id]) {
-      queryParams[ref.id] = { $ref: ref.id }
+      properties[param.name] = (param.schema) ? { ...param.schema } : {}
     }
   })
 
-  if (Object.keys(queryParams).length === 0) {
+  if (Object.keys(properties).length === 0) {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(queryParams, jsfRefs)
-
+  const schema = { type: 'object', properties }
+  const processedSchema = processRefs(schema, jsfRefs)
+  let fakedResponse = JSONSchemaSampler.sample(processedSchema, samplerOptions)
+  if (fakedResponse === null) fakedResponse = {}
   return fakedResponse
 }
 
 const generateMockPathParams = async (method, name, data, jsfRefs) => {
-  const pathParams = {}
+  const properties = {}
   data.parameters.forEach(param => {
     if (param.in === 'path') {
-      pathParams[param.name] = (param.schema) ? { ...param.schema } : {}
-    }
-  })
-  jsfRefs.forEach(ref => {
-    if (pathParams[ref.id]) {
-      pathParams[ref.id] = { $ref: ref.id }
+      properties[param.name] = (param.schema) ? { ...param.schema } : {}
     }
   })
 
-  if (Object.keys(pathParams).length === 0) {
+  if (Object.keys(properties).length === 0) {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(pathParams, jsfRefs)
-
+  const schema = { type: 'object', properties }
+  const processedSchema = processRefs(schema, jsfRefs)
+  let fakedResponse = JSONSchemaSampler.sample(processedSchema, samplerOptions)
+  if (fakedResponse === null) fakedResponse = {}
   return fakedResponse
 }
 
