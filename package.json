@@ -8,9 +8,6 @@
     "Miguel de Barros <miguel.debarros@modusbox.com>",
     "Juan Correa <code@juancorrea.io>"
   ],
-  "engines": {
-    "node": "22.15.0"
-  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
