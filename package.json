@@ -5,11 +5,9 @@
   "main": "src/index.js",
   "contributors": [
     "Vijaya Kumar <vijaya.guthi@modusbox.com>",
-    "Miguel de Barros <miguel.debarros@modusbox.com>"
+    "Miguel de Barros <miguel.debarros@modusbox.com>",
+    "Juan Correa <code@juancorrea.io>"
   ],
-  "engines": {
-    "node": ">=18.x"
-  },
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -47,22 +45,22 @@
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.8.0",
+    "@stoplight/json-schema-sampler": "0.3.0",
     "ajv": "8.17.1",
-    "faker": "5.5.3",
-    "json-schema-faker": "0.5.8",
     "json-schema-ref-parser": "9.0.9",
     "lodash": "4.17.21",
     "node-dir": "0.1.17"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.7.1",
-    "@commitlint/config-conventional": "^19.7.1",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@types/jest": "29.5.14",
     "audit-ci": "^7.1.0",
     "husky": "^9.1.7",
     "jest": "29.7.0",
     "jest-junit": "16.0.0",
-    "npm-check-updates": "17.1.14",
+    "npm-check-updates": "18.0.1",
     "pre-commit": "^1.2.2",
     "replace": "^1.2.2",
     "standard": "^17.1.2",
@@ -71,7 +69,8 @@
   "overrides": {
     "cross-spawn": "7.0.6",
     "glob": "9.3.5",
-    "rimraf": "5.0.10"
+    "rimraf": "5.0.10",
+    "@babel/helpers": "7.26.10"
   },
   "standard-version": {
     "scripts": {

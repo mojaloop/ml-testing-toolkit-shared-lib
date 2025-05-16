@@ -1,7 +1,2 @@
 ## Add a TODO comment indicating the reason for each rejected dependency upgrade added to this list, and what should be done to resolve it (i.e. handle it through a story, etc).
-reject: [
-  # Downgraded to 5.5.3 - Reason: removal of functional code in faker.js - https://github.com/advisories/GHSA-5w9c-rv96-fr7g
-  "faker",
-  # json-schema-faker v0.5.0 - Reason: Introduces some url rendering issues and has huge changes between v0.5.0-rcv.46 and v0.5.0
-  "json-schema-faker"
-]
+reject: []
