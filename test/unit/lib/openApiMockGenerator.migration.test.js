@@ -21,9 +21,8 @@
 
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
+ - Juan Correa <code@juancorrea.io>
 
- * ModusBox
- * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
  --------------
  ******/
 

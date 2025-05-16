@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "contributors": [
     "Vijaya Kumar <vijaya.guthi@modusbox.com>",
-    "Miguel de Barros <miguel.debarros@modusbox.com>"
+    "Miguel de Barros <miguel.debarros@modusbox.com>",
+    "Juan Correa <code@juancorrea.io>"
   ],
   "engines": {
     "node": "22.15.0"
