@@ -700,3 +700,86 @@ describe('postProcessMock and FSP ID Generation Tests', () => {
     })
   })
 })
+
+describe('Header Generation', () => {
+  it('should generate specific HTTP headers with correct formats', async () => {
+    const mockGenerator = new OpenApiMockGenerator()
+
+    // Mock the schema.paths property for the OpenApiRequestGenerator
+    mockGenerator.schema = {
+      paths: {
+        '/test': {
+          get: {
+            operationId: 'testOperation',
+            parameters: [
+              {
+                in: 'header',
+                name: 'accept',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'content-type',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'date',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'x-forwarded-for',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'fspiop-source',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'fspiop-destination',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'fspiop-encryption',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'fspiop-signature',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'fspiop-uri',
+                schema: { type: 'string' }
+              },
+              {
+                in: 'header',
+                name: 'fspiop-http-method',
+                schema: { type: 'string' }
+              }
+            ]
+          }
+        }
+      }
+    }
+
+    const headers = await mockGenerator.generateRequestHeaders('/test', 'get', [])
+
+    expect(headers.accept).toBe('application/vnd.interoperability.transactionRequests+json;version=1')
+    expect(headers['content-type']).toBe('application/vnd.interoperability.transactionRequests+json;version=1.1')
+    expect(typeof headers.date).toBe('string')
+    expect(headers.date).toMatch(/^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/)
+    expect(headers['x-forwarded-for']).toBe('in')
+    expect(headers['fspiop-source']).toBe('magna')
+    expect(headers['fspiop-destination']).toBe('culpa magna proident')
+    expect(headers['fspiop-encryption']).toBe('voluptate incididunt ut sed')
+    expect(headers['fspiop-signature']).toBe('non Lorem consequat')
+    expect(headers['fspiop-uri']).toBe('labore')
+    expect(headers['fspiop-http-method']).toBe('Duis id')
+  })
+})

@@ -360,6 +360,10 @@ const customFormatHandlers = {
   'date-time': () => {
     // Always use toISOString() which includes milliseconds
     return new Date().toISOString()
+  },
+  date: () => {
+    // Return just the date part in ISO format: YYYY-MM-DD
+    return new Date().toISOString().split('T')[0]
   }
 }
 
@@ -368,6 +372,56 @@ const customTypeHandler = (schema) => {
   if (!schema || typeof schema !== 'object') return undefined
 
   const key = schema.key || ''
+
+  // Handle common HTTP headers with proper formats
+  if (matchesField(key, 'accept', 'Accept')) {
+    return 'application/vnd.interoperability.transactionRequests+json;version=1'
+  }
+
+  if (matchesField(key, 'content-type', 'Content-Type', 'contentType')) {
+    return 'application/vnd.interoperability.transactionRequests+json;version=1.1'
+  }
+
+  // Handle date in headers vs date in body - different formats for each context
+  // For HTTP headers: Use UTC string format (Tue, 03 Jun 2025 00:00:24 GMT)
+  // For body fields: Use ISO format (YYYY-MM-DD)
+  if (key.toLowerCase() === 'date') {
+    const date = new Date()
+    // If this is a header parameter, use UTC string format
+    if (schema.parentKey === 'parameters' || schema.in === 'header') {
+      return date.toUTCString()
+    }
+    // Otherwise it's a body field, use ISO date format
+    return date.toISOString().split('T')[0]
+  }
+
+  if (matchesField(key, 'x-forwarded-for', 'X-Forwarded-For')) {
+    return 'in'
+  }
+
+  if (matchesField(key, 'fspiop-source', 'FSPIOP-Source', 'fspiopSource')) {
+    return 'magna'
+  }
+
+  if (matchesField(key, 'fspiop-destination', 'FSPIOP-Destination', 'fspiopDestination')) {
+    return 'culpa magna proident'
+  }
+
+  if (matchesField(key, 'fspiop-encryption', 'FSPIOP-Encryption', 'fspiopEncryption')) {
+    return 'voluptate incididunt ut sed'
+  }
+
+  if (matchesField(key, 'fspiop-signature', 'FSPIOP-Signature', 'fspiopSignature')) {
+    return 'non Lorem consequat'
+  }
+
+  if (matchesField(key, 'fspiop-uri', 'FSPIOP-URI', 'fspiopUri')) {
+    return 'labore'
+  }
+
+  if (matchesField(key, 'fspiop-http-method', 'FSPIOP-HTTP-Method', 'fspiopHttpMethod')) {
+    return 'Duis id'
+  }
 
   // Always handle state, reason, status fields
   if (matchesField(key, 'state', 'status', 'reason')) {
@@ -396,8 +450,8 @@ const customTypeHandler = (schema) => {
     return customFormatHandlers['date-time']()
   }
 
-  // Handle date fields
-  if (matchesField(key, 'dateOfBirth', 'date')) {
+  // Handle date fields (as body parameters, not HTTP headers)
+  if (matchesField(key, 'dateOfBirth', 'date') && schema.parentKey !== 'parameters') {
     const date = new Date()
     return date.toISOString().split('T')[0]
   }
@@ -828,7 +882,9 @@ const generateMockHeaders = async (method, name, data, jsfRefs) => {
   const properties = {}
   data.parameters.forEach(param => {
     if (param.in === 'header') {
-      properties[param.name] = (param.schema && param.schema.type) ? { type: param.schema.type } : {}
+      properties[param.name] = (param.schema && param.schema.type)
+        ? { type: param.schema.type, in: 'header' }
+        : { in: 'header' }
     }
   })
 
