@@ -1,8 +1,5 @@
+disabled: true
 ignore:
-  # Ignore cross-spawn vulnerabilities by CVE ID due to false positive
-  # as grype looks at package-lock.json where it shows versions with
-  # vulnerabilities, npm ls shows only 7.0.6 verion is used
-
 
 # Set output format defaults
 output:
@@ -14,5 +11,3 @@ search:
   scope: "squashed"
 quiet: false
 check-for-app-update: false
-
-disable: true
