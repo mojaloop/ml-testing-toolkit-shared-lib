@@ -12,5 +12,9 @@ module.exports = {
     }
   },
   modulePathIgnorePatterns: [],
-  testEnvironment: 'node'
+  testEnvironment: 'node',
+  // Mock ESM modules that Jest can't handle
+  moduleNameMapper: {
+    '^@faker-js/faker$': '<rootDir>/__mocks__/@faker-js/faker.js'
+  }
 }
