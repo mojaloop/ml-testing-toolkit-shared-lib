@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/als-consent-oracle](https://github.com/mojaloop/als-consent-oracle)
+## [14.3.0](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/compare/v14.2.0...v14.3.0) (2025-09-26)
+
+
+### Features
+
+* add grype src scan, up deps plus jest conf ([#25](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues/25)) ([8e9ee15](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/commit/8e9ee15cd3292e27ac443d42bdc1dffd22364aa2))
+
 ## [14.2.0](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/compare/v14.1.0...v14.2.0) (2025-07-15)
 
 
