@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/als-consent-oracle](https://github.com/mojaloop/als-consent-oracle)
+### [14.3.1](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/compare/v14.3.0...v14.3.1) (2025-11-06)
+
+
+### Chore
+
+* update dependencies ([#27](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues/27)) ([126c67e](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/commit/126c67eb0f0bd495f6b5acc507e9b23d640617a3))
+
 ## [14.3.0](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/compare/v14.2.0...v14.3.0) (2025-09-26)
 
 
