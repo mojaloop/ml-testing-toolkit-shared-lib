@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/als-consent-oracle](https://github.com/mojaloop/als-consent-oracle)
+### [14.3.2](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/compare/v14.3.1...v14.3.2) (2026-01-13)
+
+
+### Chore
+
+* update CircleCI orb ([#28](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues/28)) ([fe52e39](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/commit/fe52e393c9d7eb6d44388e4c8d088ed0d0af8991))
+
 ### [14.3.1](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/compare/v14.3.0...v14.3.1) (2025-11-06)
 
 
