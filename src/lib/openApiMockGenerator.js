@@ -21,6 +21,7 @@
 
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
+ - Kim Yungju <yjkim101002@gmail.com> [Assisted by OpenAI Codex GPT-5]
 
  * ModusBox
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)
@@ -32,18 +33,61 @@ const _ = require('lodash')
 // const jref = require('json-ref-lite')
 // const yaml = require('js-yaml')
 const { faker } = require('@faker-js/faker')
-const jsf = require('json-schema-faker')
-const $RefParser = require('@apidevtools/json-schema-ref-parser')
 const Ajv = require('ajv')
 
-jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence({ min: 12, max: 12 })).toString('base64'))
-
-jsf.option({
+const jsfOptions = {
   alwaysFakeOptionals: true,
+  fillProperties: true,
   ignoreMissingRefs: true,
-  maxItems: 2
-})
-jsf.extend('faker', () => require('@faker-js/faker').faker)
+  maxDefaultItems: 2,
+  maxItems: 2,
+  formats: {
+    byte: () => Buffer.alloc(faker.lorem.sentence({ min: 12, max: 12 })).toString('base64')
+  },
+  extensions: {
+    faker
+  }
+}
+
+let jsfModulePromise
+const getJsonSchemaFaker = async () => {
+  if (!jsfModulePromise) {
+    jsfModulePromise = import('json-schema-faker')
+  }
+  return jsfModulePromise
+}
+
+let refParserModulePromise
+const getRefParser = async () => {
+  if (!refParserModulePromise) {
+    refParserModulePromise = import('@apidevtools/json-schema-ref-parser')
+  }
+  const refParser = await refParserModulePromise
+  return refParser.default || refParser
+}
+
+const generateSchemaValue = async (schema) => {
+  const jsf = await getJsonSchemaFaker()
+  return jsf.generate(schema, jsfOptions)
+}
+
+const generateObjectValue = async (properties) => {
+  return generateSchemaValue({
+    type: 'object',
+    properties,
+    required: Object.keys(properties)
+  })
+}
+
+const applyJsfRefOverride = (targetObject, ref) => {
+  if (!targetObject || !ref.pattern) {
+    return
+  }
+
+  targetObject.type = targetObject.type || 'string'
+  targetObject.pattern = ref.pattern
+  delete targetObject.enum
+}
 
 const ajv = new Ajv({
   strict: false,
@@ -54,6 +98,7 @@ const ajv = new Ajv({
 
 async function loadYamlFile (fn) {
   // let tree = yaml.safeLoad(fs.readFileSync(fn, 'utf8'))
+  const $RefParser = await getRefParser()
   let tree = await $RefParser.parse(fn)
 
   // Add keys to schemas
@@ -151,16 +196,12 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
     const targetObject = _.get(newResponseSchema.type === 'array' ? newResponseSchema.items.properties : newResponseSchema.properties, convertedId)
 
     if (targetObject) {
-      targetObject.$ref = ref.id
-      if (ref.pattern) {
-        delete targetObject.pattern
-        delete targetObject.enum
-      }
+      applyJsfRefOverride(targetObject, ref)
     }
   })
 
   const fakedResponse = {}
-  fakedResponse.body = await jsf.resolve(newResponseSchema, jsfRefs)
+  fakedResponse.body = await generateSchemaValue(newResponseSchema)
   for (const key in data.responses) {
     fakedResponse.status = key
     if (key >= 200 && key <= 299) {
@@ -178,15 +219,11 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
     const convertedId = ref.id.replace(/\./g, '.properties.')
     const targetObject = _.get(newRequestSchema.properties, convertedId)
     if (targetObject) {
-      targetObject.$ref = ref.id
-      if (ref.pattern) {
-        delete targetObject.pattern
-        delete targetObject.enum
-      }
+      applyJsfRefOverride(targetObject, ref)
     }
   })
 
-  const fakedResponse = await jsf.resolve(newRequestSchema, jsfRefs)
+  const fakedResponse = await generateSchemaValue(newRequestSchema)
 
   return fakedResponse
 }
@@ -200,7 +237,7 @@ const generateMockHeaders = async (method, name, data, jsfRefs) => {
   })
   jsfRefs.forEach(ref => {
     if (headers[ref.id]) {
-      headers[ref.id] = { $ref: ref.id }
+      applyJsfRefOverride(headers[ref.id], ref)
     }
   })
 
@@ -208,7 +245,7 @@ const generateMockHeaders = async (method, name, data, jsfRefs) => {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(headers, jsfRefs)
+  const fakedResponse = await generateObjectValue(headers)
 
   return fakedResponse
 }
@@ -222,7 +259,7 @@ const generateMockQueryParams = async (method, name, data, jsfRefs) => {
   })
   jsfRefs.forEach(ref => {
     if (queryParams[ref.id]) {
-      queryParams[ref.id] = { $ref: ref.id }
+      applyJsfRefOverride(queryParams[ref.id], ref)
     }
   })
 
@@ -230,7 +267,7 @@ const generateMockQueryParams = async (method, name, data, jsfRefs) => {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(queryParams, jsfRefs)
+  const fakedResponse = await generateObjectValue(queryParams)
 
   return fakedResponse
 }
@@ -244,7 +281,7 @@ const generateMockPathParams = async (method, name, data, jsfRefs) => {
   })
   jsfRefs.forEach(ref => {
     if (pathParams[ref.id]) {
-      pathParams[ref.id] = { $ref: ref.id }
+      applyJsfRefOverride(pathParams[ref.id], ref)
     }
   })
 
@@ -252,7 +289,7 @@ const generateMockPathParams = async (method, name, data, jsfRefs) => {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(pathParams, jsfRefs)
+  const fakedResponse = await generateObjectValue(pathParams)
 
   return fakedResponse
 }
