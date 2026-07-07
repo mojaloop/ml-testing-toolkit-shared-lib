@@ -21,6 +21,7 @@
 
  * Mojaloop Foundation
  - Name Surname <name.surname@mojaloop.io>
+ - Kim Yungju <yjkim101002@gmail.com> [Assisted by OpenAI Codex GPT-5]
 
  * ModusBox
  * Vijaya Kumar Guthi <vijaya.guthi@modusbox.com> (Original Author)

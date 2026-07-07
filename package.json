@@ -56,13 +56,13 @@
     "node-dir": "0.1.17"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.1.0",
-    "@commitlint/config-conventional": "^21.1.0",
+    "@commitlint/cli": "^21.2.0",
+    "@commitlint/config-conventional": "^21.2.0",
     "@types/jest": "30.0.0",
     "audit-ci": "^7.1.0",
     "jest": "30.4.2",
     "jest-junit": "17.0.0",
-    "npm-check-updates": "22.2.7",
+    "npm-check-updates": "22.2.9",
     "pre-commit": "^2.0.0",
     "replace": "^1.2.2",
     "standard": "^17.1.2",
