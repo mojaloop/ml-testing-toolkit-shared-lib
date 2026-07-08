@@ -1,4 +1,11 @@
 # Changelog: [mojaloop/als-consent-oracle](https://github.com/mojaloop/als-consent-oracle)
+### [14.3.4](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/compare/v14.3.3...v14.3.4) (2026-07-08)
+
+
+### Chore
+
+* take dependency majors per no-preemptive-reject policy [mojalo… ([#32](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/issues/32)) ([8cdca56](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/commit/8cdca567756559d50fbdb57534b84dddb0a8a4c8))
+
 ### [14.3.3](https://github.com/mojaloop/ml-testing-toolkit-shared-lib/compare/v14.3.2...v14.3.3) (2026-02-13)
 
 
