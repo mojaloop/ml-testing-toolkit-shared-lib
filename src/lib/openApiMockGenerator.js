@@ -32,18 +32,38 @@ const _ = require('lodash')
 // const jref = require('json-ref-lite')
 // const yaml = require('js-yaml')
 const { faker } = require('@faker-js/faker')
-const jsf = require('json-schema-faker')
 const $RefParser = require('@apidevtools/json-schema-ref-parser')
 const Ajv = require('ajv')
 
-jsf.format('byte', () => Buffer.alloc(faker.lorem.sentence({ min: 12, max: 12 })).toString('base64'))
+// json-schema-faker v0.6+ is ESM-only (exports map only defines an "import" condition),
+// so it cannot be require()d from this CommonJS module and is lazy-loaded via dynamic import.
+let jsfModulePromise = null
+const getJsf = () => {
+  if (!jsfModulePromise) {
+    jsfModulePromise = import('json-schema-faker')
+  }
+  return jsfModulePromise
+}
 
-jsf.option({
-  alwaysFakeOptionals: true,
-  ignoreMissingRefs: true,
-  maxItems: 2
-})
-jsf.extend('faker', () => require('@faker-js/faker').faker)
+// v0.6 replaced the global jsf.format()/jsf.option()/jsf.extend()/jsf.resolve() API with a
+// per-call generate(schema, options) API. jsfRefs ({ id, ... }) entries are served through
+// options.refResolver; unknown $refs resolve to an empty schema (v0.5 ignoreMissingRefs: true).
+const jsfGenerate = async (schema, jsfRefs = []) => {
+  const { generate } = await getJsf()
+  const refSchemas = {}
+  jsfRefs.forEach(({ id, ...refSchema }) => {
+    refSchemas[id] = refSchema
+  })
+  return generate(schema, {
+    alwaysFakeOptionals: true,
+    maxItems: 2,
+    formats: {
+      byte: () => Buffer.alloc(faker.lorem.sentence({ min: 12, max: 12 })).toString('base64')
+    },
+    extensions: { faker },
+    refResolver: (ref) => refSchemas[ref] || {}
+  })
+}
 
 const ajv = new Ajv({
   strict: false,
@@ -160,7 +180,7 @@ const generateMockResponseBody = async (method, name, data, jsfRefs) => {
   })
 
   const fakedResponse = {}
-  fakedResponse.body = await jsf.resolve(newResponseSchema, jsfRefs)
+  fakedResponse.body = await jsfGenerate(newResponseSchema, jsfRefs)
   for (const key in data.responses) {
     fakedResponse.status = key
     if (key >= 200 && key <= 299) {
@@ -186,7 +206,7 @@ const generateMockOperation = async (method, name, data, jsfRefs) => {
     }
   })
 
-  const fakedResponse = await jsf.resolve(newRequestSchema, jsfRefs)
+  const fakedResponse = await jsfGenerate(newRequestSchema, jsfRefs)
 
   return fakedResponse
 }
@@ -208,7 +228,7 @@ const generateMockHeaders = async (method, name, data, jsfRefs) => {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(headers, jsfRefs)
+  const fakedResponse = await jsfGenerate(headers, jsfRefs)
 
   return fakedResponse
 }
@@ -230,7 +250,7 @@ const generateMockQueryParams = async (method, name, data, jsfRefs) => {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(queryParams, jsfRefs)
+  const fakedResponse = await jsfGenerate(queryParams, jsfRefs)
 
   return fakedResponse
 }
@@ -252,7 +272,7 @@ const generateMockPathParams = async (method, name, data, jsfRefs) => {
     return {}
   }
 
-  const fakedResponse = await jsf.resolve(pathParams, jsfRefs)
+  const fakedResponse = await jsfGenerate(pathParams, jsfRefs)
 
   return fakedResponse
 }
