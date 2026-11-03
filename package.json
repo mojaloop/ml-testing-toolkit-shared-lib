@@ -48,7 +48,7 @@
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "16.0.2",
+    "@apidevtools/json-schema-ref-parser": "16.0.5",
     "@faker-js/faker": "10.6.0",
     "ajv": "8.20.0",
     "json-schema-faker": "0.6.3",
@@ -56,13 +56,13 @@
     "node-dir": "0.1.17"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.2",
-    "@commitlint/config-conventional": "^21.2.2",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@types/jest": "30.0.0",
     "audit-ci": "^7.1.0",
-    "jest": "30.5.1",
+    "jest": "30.5.2",
     "jest-junit": "17.0.0",
-    "npm-check-updates": "23.1.0",
+    "npm-check-updates": "23.1.1",
     "pre-commit": "^2.0.0",
     "replace": "^1.2.2",
     "standard": "^17.1.2",
@@ -70,18 +70,22 @@
   },
   "overrides": {
     "cross-spawn": "7.0.6",
-    "glob": "9.3.5",
     "rimraf": "5.0.10",
     "@babel/helpers": "7.26.10",
-    "brace-expansion": "1.1.18",
     "browserslist": "4.28.7",
     "baseline-browser-mapping": "2.11.0",
-    "fast-uri": "3.1.6",
+    "fast-uri": "3.1.9",
     "js-yaml@4": "4.3.2",
     "typescript": "6.0.3",
     "replace": {
       "minimatch": "3.1.5"
-    }
+    },
+    "brace-expansion@1": "1.1.21",
+    "brace-expansion@2": "2.1.7",
+    "brace-expansion@5": "5.0.12",
+    "glob@>=9 <14.0.2": "14.0.3",
+    "minimatch@>=8 <11.0.1": "11.0.4",
+    "handlebars": "4.7.10"
   },
   "standard-version": {
     "scripts": {
