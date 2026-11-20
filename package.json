@@ -42,8 +42,8 @@
     "cover": "npx nyc --all report --reporter=lcov npm run test",
     "audit:check": "npx audit-ci --config ./audit-ci.jsonc",
     "audit:fix": "npm audit fix",
-    "dep:check": "npx ncu -e 2",
-    "dep:update": "npx ncu -u",
+    "dep:check": "npx npm-check-updates -e 2",
+    "dep:update": "npx npm-check-updates -u",
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
