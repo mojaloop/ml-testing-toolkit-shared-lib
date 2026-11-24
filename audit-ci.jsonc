@@ -3,5 +3,5 @@
   // audit-ci supports reading JSON, JSONC, and JSON5 config files.
   // Only use one of ["low": true, "moderate": true, "high": true, "critical": true]
   "moderate": true,
-  "allowlist": ["GHSA-p8wg-vrv2-v86f", "GHSA-3g3m-2fjr-6pw4", "GHSA-g3hv-75wg-m249"]
+  "allowlist": ["GHSA-3g3m-2fjr-6pw4", "GHSA-g3hv-75wg-m249"]
 }
