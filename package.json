@@ -48,7 +48,7 @@
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "16.0.8",
+    "@apidevtools/json-schema-ref-parser": "16.1.1",
     "@faker-js/faker": "10.6.0",
     "ajv": "8.20.0",
     "json-schema-faker": "0.6.4",
